@@ -99,7 +99,7 @@ Our motivation comes from differential privacy. Suppose each point of $P$ is the
 \[
   \errs(\eps,n)\;=\;\inf_{M}\ \sup_{|P|\le n}\ \Ex\,\bigl|M(P)-U(P)\bigr|,
 \]
-where $M$ ranges over $\eps$-node-private algorithms and $n$ is a public bound on the number of points. Our first result says that this privacy question is \emph{exactly} the geometric question above.
+where $M$ ranges over $\eps$-node-private algorithms and $n$ is a public bound on the number of points. Our first result says that, up to constant factors, this privacy question is the geometric question above.
 
 \begin{restatable}[Reduction]{theorem}{reduction}
 \label{thm:reduction}
@@ -165,19 +165,22 @@ By the 2026 results, both hold: for every $\eta\in[0,0.014)$ there are infinitel
 
 \begin{figure}[!t]
 \centering
-\begin{tikzpicture}[x=6.4cm,y=5.0cm]
-  % region for the Euclidean norm (schematic delta = 0.06)
-  \fill[gray!18] (0,1) -- (0.5,1) -- (1,4/3) -- (1,1.06) -- (0.94,1) -- cycle;
-  \draw[->] (0,1) -- (1.08,1) node[below left] {\small $\log_n(1/\eps)$};
-  \draw[->] (0,1) -- (0,1.62) node[left] {\small $\log_n \errs$};
-  \foreach \x/\l in {0/0,0.5/\frac12,1/1} \draw (\x,1) -- (\x,0.985) node[below] {\small $\l$};
-  \foreach \y/\l in {1/1,4/3/\frac43} \draw (0,\y) -- (-0.015,\y) node[left] {\small $\l$};
-  \draw[dashed] (0,1) -- (0.6,1.6) node[right] {\small Laplace; norms with a segment};
-  \draw[thick] (0,1) -- (0.5,1) -- (1,4/3) node[right] {\small strictly convex; Valtr};
-  \draw[thick,dotted] (0.94,1) -- (1,1.06) node[right] {\small Euclidean lower bound};
-  \fill (1,1.06) circle (0.6pt);
-  \draw[very thick] (0,1) -- (1,1);
-  \node[below] at (0.27,1.0) {\small almost all norms ($\tilde\Theta(n)$)};
+\begin{tikzpicture}[x=6.4cm,y=6cm]
+  % vertical coordinate = exponent minus 1; schematic delta = 0.06
+  \fill[gray!18] (0,0) -- (0.5,0) -- (1,0.3333) -- (1,0.06) -- (0.94,0) -- cycle;
+  \draw[->] (0,0) -- (1.1,0) node[right] {\small $\log_n(1/\eps)$};
+  \draw[->] (0,0) -- (0,0.66) node[above] {\small $\log_n \errs$};
+  \draw (0,0) -- (0,-0.015) node[below] {\small $0$};
+  \draw (0.5,0) -- (0.5,-0.015) node[below] {\small $\frac12$};
+  \draw (1,0) -- (1,-0.015) node[below] {\small $1$};
+  \draw (0,0) -- (-0.015,0) node[left] {\small $1$};
+  \draw (0,0.3333) -- (-0.015,0.3333) node[left] {\small $\frac43$};
+  \draw[dashed] (0,0) -- (0.6,0.6) node[right] {\small Laplace; norms with a segment};
+  \draw[thick] (0,0) -- (0.5,0) -- (1,0.3333) node[right] {\small strictly convex; Valtr's norm};
+  \draw[thick,dotted] (0.94,0) -- (1,0.06) node[right] {\small Euclidean lower bound};
+  \fill (1,0.06) circle (0.6pt);
+  \draw[very thick] (0,0) -- (1,0);
+  \node[above] at (0.25,0.0) {\small almost all norms};
 \end{tikzpicture}
 \caption{Exponent of the optimal error against $\log_n(1/\eps)$. Shaded: the range allowed for the Euclidean norm by \cref{thm:euclid}; its lower edge is drawn with $\delta=0.06$, while the best known value is $\delta\ge0.014$.}
 \label{fig:rates}
@@ -293,10 +296,12 @@ For every $P\in\cP_n$ and real $D\ge0$, $\tail_D(P)\le\max_{0\le j\le n}\bigl(\L
 Let $S$ be the set of points of degree larger than $D$ and $j=|S|$. Then $\tail_D(P)=\sum_{p\in S}\deg_P(p)-jD\le S_j(P)-jD\le\Lam_j(n)-jD$.
 \end{proof}
 
+The proof below uses only properties (a) and (b) of \cref{lem:surrogate}. Any statistic with these two properties can replace $g_D$; for integer $D$ this includes the integral statistic of \cref{app:surrogates}.
+
 \reduction*
 
 \begin{proof}
-\emph{Upper bound.} Let $k=\lceil1/\eps\rceil$, $\lambda=\Lam_k(n)$ and $D=\lambda/k$. The algorithm outputs $g_D(P)+Z$ with $Z$ Laplace of scale $D/\eps$; it is $\eps$-node-private on all finite sets by \cref{lem:surrogate}(a). For $j\ge k$, \cref{lem:average} gives $\Lam_j(n)-jD\le0$, and for $j<k$ we have $\Lam_j(n)-jD\le\lambda$. By \cref{lem:tail,lem:surrogate}(b), for every $P\in\cP_n$,
+\emph{Upper bound.} Let $k=\lceil1/\eps\rceil$, $\lambda=\Lam_k(n)$ and $D=\lambda/k$. The algorithm outputs $g_D(P)+Z$ with $Z$ Laplace of scale $D/\eps$; it is $\eps$-node-private on all finite sets by \cref{lem:surrogate}(a). For $j\ge k$, \cref{lem:average} gives $\Lam_j(n)-jD\le0$, and for $j<k$ we have $\Lam_j(n)-jD\le\lambda$. By \cref{lem:tail} and \cref{lem:surrogate}(b), for every $P\in\cP_n$,
 \[
   \Ex|g_D(P)+Z-U(P)|\le\tail_D(P)+\Ex|Z|\le\lambda+\frac{\lambda}{k\eps}\le2\lambda .
 \]
@@ -322,7 +327,7 @@ The algorithm needs the value $\Lam_k(n)$. If only an upper bound $\lambda\ge\La
 
 \emph{$\Lam_k(n)\le I(n,k)$.} Let $P\in\cP_n$ and let $C$ be a set of $\min\{k,|P|\}$ points of $P$ of largest degree. The unit circles $c+\mathbb S$, $c\in C$, are distinct, and $S_k(P)=\sum_{c\in C}|P\cap(c+\mathbb S)|=I(P,\{c+\mathbb S\}_{c\in C})\le I(n,k)$.
 
-\emph{$I(n,k)\le2\Lam_k(n)$ for $k\le n/2$.} Let $B$ be a set of at most $n$ points and $R$ a set of $k$ centres. Split $B$ into two parts of at most $\lceil n/2\rceil$ points each, and let $B'$ be a part that carries at least half of the incidences. The set $Q=B'\cup R$ has at most $\lceil n/2\rceil+k\le n$ points. Each $r\in R$ has $\deg_Q(r)\ge|B'\cap(r+\mathbb S)|$, hence $\Lam_k(n)\ge S_k(Q)\ge\sum_{r\in R}\deg_Q(r)\ge I(B,R)/2$.
+\emph{$I(n,k)\le2\Lam_k(n)$ for $k\le n/2$.} Let $B$ be a set of at most $n$ points, $R$ a set of $k$ centres, and $\Gamma_R=\{r+\mathbb S\}_{r\in R}$. Split $B$ into two parts of at most $\lceil n/2\rceil$ points each, and let $B'$ be a part with $I(B',\Gamma_R)\ge I(B,\Gamma_R)/2$. The set $Q=B'\cup R$ has at most $\lceil n/2\rceil+k\le n$ points. Each $r\in R$ has $\deg_Q(r)\ge|B'\cap(r+\mathbb S)|$, hence $\Lam_k(n)\ge S_k(Q)\ge\sum_{r\in R}\deg_Q(r)\ge I(B,\Gamma_R)/2$.
 \end{proof}
 
 \Cref{lem:tail} also bounds the degree tail of every set by the top-degree mass. With \cref{thm:norms}(2) this gives, for every strictly convex norm,
@@ -330,7 +335,7 @@ The algorithm needs the value $\Lam_k(n)$. If only an upper bound $\lambda\ge\La
 \label{eq:tail}
   \tail_D(P)\le\max_{j}\bigl(C(n^{2/3}j^{2/3}+n)-jD\bigr)=O\bigl(n^2/D^2+n\bigr)\qquad(P\in\cP_n,\ D\ge1).
 \end{equation}
-Both terms are needed: a star with $2D$ leaves repeated $\lfloor n/(2D+1)\rfloor$ times has tail $\Omega(n)$, and by \cref{thm:norms}(3) the first term is attained for Valtr's norm. We note that \eqref{eq:tail} applies the incidence bound once, to the circles centred at the high-degree points; summing a bound on the number of $j$-rich points over all $j>D$ would lose a logarithmic factor.
+Both terms are needed. A star with $2D$ leaves, repeated $\lfloor n/(2D+1)\rfloor$ times, has tail $\Omega(n)$. Since $\tail_D(P)\ge S_k(P)-kD$ for every $k$, \cref{thm:norms}(3) with $k\asymp n^2/D^3$ shows that for Valtr's norm the first term is attained when $n^{1/3}\lesssim D\lesssim n^{1/2}$. We note that \eqref{eq:tail} applies the incidence bound once, to the circles centred at the high-degree points; summing a bound on the number of $j$-rich points over all $j>D$ would lose a logarithmic factor.
 
 %======================================================================
 \section{Norms on the plane}
@@ -346,12 +351,32 @@ Let the segment $\{v+tw:|t|\le1\}$ lie on $\mathbb S$. Put $m=\lfloor n/2\rfloor
 In a strictly convex norm, two distinct unit circles meet in at most two points, and two distinct points lie on at most two common unit circles (\cref{lem:pseudo} in \cref{app:geometry}). For such families, Sz\'ekely's crossing-number argument~\cite{Szekely97}, or the theorem of Pach and Sharir~\cite{PachSharir98}, gives $I(P,\Gamma)\le C_0(|P|^{2/3}|\Gamma|^{2/3}+|P|+|\Gamma|)$; we include the argument in \cref{app:geometry}. By \cref{thm:incidences}, $\Lam_k(n)\le I(n,k)\le C_0(n^{2/3}k^{2/3}+n+k)$, and $k\le n$.
 \end{proof}
 
+
+\begin{figure}[!t]
+\centering
+\begin{tikzpicture}[scale=1.25]
+  \foreach \a/\b in {-0.5/0, 0.15/0.3, 0.6/-0.1} {
+    \draw[gray] plot[domain=-1:1,samples=40] ({\a+\x},{\b-0.5*(1-\x*\x)});
+    \draw[thick] plot[domain=-1:1,samples=40] ({\a+\x},{\b+0.5*(1-\x*\x)});
+    \fill (\a,\b) circle (0.8pt);
+  }
+  \draw[->] (1.9,0.35) -- node[above] {\small $\Phi$} (2.8,0.35);
+  \begin{scope}[xshift=4.6cm]
+    \foreach \a/\b in {-0.5/0, 0.15/0.3, 0.6/-0.1} {
+      \draw[thick] ({\a-1},{\b+0.5-0.5*\a*\a+\a*(\a-1)}) -- ({\a+1},{\b+0.5-0.5*\a*\a+\a*(\a+1)});
+    }
+  \end{scope}
+\end{tikzpicture}
+\caption{Left: three unit circles of Valtr's norm, each bounded by two parabolic arcs. Right: the map $\Phi(x,y)=(x,y+x^2/2)$ sends the upper arcs (bold) to line segments whose slope is the first coordinate of the centre. Point sets with many point--line incidences therefore yield many unit distances.}
+\label{fig:valtr}
+\end{figure}
+
 \begin{proof}[Proof of (3)]
 The norm $\nrm{(x,y)}=|y|+\sqrt{x^2+y^2}$ is the sum of the Euclidean norm and a seminorm, so it is strictly convex~\cite{Valtr05,Swanepoel18}. For a centre $c=(a,b)$ and a point $p=(x,y)$ with $y\ge b$, the equation $\nrm{p-c}=1$ is equivalent to
 \[
   y=b+\tfrac12\bigl(1-(x-a)^2\bigr),\qquad |x-a|\le1 .
 \]
-The bijection $\Phi(x,y)=(x,\,y+x^2/2)$ maps this arc into the line $Y=aX+(b+\frac12-\frac{a^2}2)$. Conversely, every point $(X,Y)$ with $|X-a|\le1$ on the line $Y=aX+\beta$ is the image of a point at unit distance from the centre $(a,\beta-\frac12+\frac{a^2}2)$.
+The bijection $\Phi(x,y)=(x,\,y+x^2/2)$ (\cref{fig:valtr}) maps this arc into the line $Y=aX+(b+\frac12-\frac{a^2}2)$. Conversely, every point $(X,Y)$ with $|X-a|\le1$ on the line $Y=aX+\beta$ is the image of a point at unit distance from the centre $(a,\beta-\frac12+\frac{a^2}2)$.
 
 Now use the grid construction for point--line incidences. For integers $A,B\ge1$, the $2A^2B$ points $(i,j)$ with $1\le i\le A$, $1\le j\le 2AB$ and the $AB^2$ lines $j=si+t$ with $1\le s\le B$, $1\le t\le AB$ have $A^2B^2$ incidences, since each line contains $A$ of the points. Apply $(i,j)\mapsto(\frac{i}{2A},\frac{j}{4AB})$: the lines get slopes $a=\frac{s}{2B}\in(0,\frac12]$, and all points have $X\in(0,\frac12]$, so $|X-a|\le1$. Applying $\Phi^{-1}$ to the points and taking the centres described above yields $2A^2B$ points and $AB^2$ distinct centres with at least $A^2B^2$ pairs at unit distance. Choosing $A$ and $B$ for given $n$ and $k$ (\cref{app:geometry}) gives $I(\lfloor n/2\rfloor,k)\ge n^{2/3}k^{2/3}/53$ for $\sqrt n\le k\le\lfloor n/2\rfloor$. By \cref{thm:incidences} and monotonicity this gives (3), with $\Lam_k(n)\ge n-1$ for $k<\sqrt n$.
 \end{proof}

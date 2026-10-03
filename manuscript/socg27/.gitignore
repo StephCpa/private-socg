@@ -1,7 +1,4 @@
+main.pdf
 main.txt
 build.log
-*.pdf
-!manuscript/pdf/*.pdf
-!manuscript/socg27/*-logo*.pdf
-!manuscript/socg27/cc-by.pdf
-!manuscript/socg27/orcid.pdf
+*.vtc
