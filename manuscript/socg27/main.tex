@@ -21,9 +21,12 @@
 %   err^*(eps,n) minimax expected error of eps-node-private counting over \cP_n
 %   "node neighbours": point sets that differ in exactly one point
 %
-% TODO(authors): decide on a truthful AI-use statement that follows the SoCG 2027 call. This draft was
-%   prepared with the help of an AI assistant (Claude); every sentence must be checked and rewritten by the
-%   authors before submission, as the rewrite plan requires.
+% TODO(authors): the visible "Use of generative AI" paragraph before the bibliography follows the
+%   Dagstuhl Publishing GenAI statement (LIPIcs): substantive use must be disclosed in the manuscript
+%   (e.g. acknowledgments or before the references) with type, purpose and extent of human review.
+%   Do NOT move it into \acknowledgements: the anonymous option hides that field from reviewers.
+%   Complete the red sentence truthfully and re-check against the SoCG 2027 call. Strip all
+%   comments (including this one) before posting the source to arXiv.
 %
 % WORDS NOT TO USE: lesson, honest, canonical, load-bearing, operating scale, high-signal,
 %   many-distance-pair, promise-oblivious, extremal context, we park, "et al."
@@ -78,8 +81,8 @@
 \maketitle
 
 \begin{abstract}
-Erd\H{o}s asked how many pairs among $n$ points in the plane can be at distance exactly~$1$. We study an unbalanced version of this question and show that it determines the cost of a basic task in data privacy. Let $\Lam_k(n)$ be the largest possible sum of the $k$ largest degrees in the unit-distance graph of at most $n$ points. We prove that the smallest expected error with which the number of unit-distance pairs can be released under $\eps$-node differential privacy is $\Theta(\Lam_{\lceil 1/\eps\rceil}(n))$, with absolute constants, for every $\eps\in(0,1]$. We also show that for $k\le n/2$, $\Lam_k(n)$ equals, up to a factor of~$2$, the maximum number of incidences between $n$ points and $k$ unit circles.
-We then compare norms on the plane. $\Lam_k(n)=\Theta(kn)$ if the unit circle contains a segment; $\Lam_k(n)=O(n^{2/3}k^{2/3}+n)$ if the norm is strictly convex, and a norm found by Valtr attains this bound for every~$k$; for almost all norms, $\Lam_k(n)=\Theta(n)$ up to a logarithmic factor. For the Euclidean norm the optimal error is $\Theta(n)$ when $\eps\ge n^{-1/2}$, a factor $1/\eps$ below the standard Laplace mechanism. It is polynomially larger than for almost all norms if and only if Erd\H{o}s's unit-distance conjecture fails, which was shown in 2026. Between these ranges the Euclidean question is an open problem on unbalanced unit-circle incidences.
+Erd\H{o}s asked how many pairs among $n$ points in the plane can be at distance exactly~$1$. We study an unbalanced version of this question and show that it determines the cost of a basic task in data privacy. Let $\Lam_k(n)$ be the largest possible sum of the $k$ largest degrees in the unit-distance graph of at most $n$ points. We prove that the smallest expected error with which the number of unit-distance pairs can be released under $\eps$-node differential privacy is $\Theta(\Lam_{\lceil 1/\eps\rceil}(n))$, with absolute constants, for every $\eps\in(0,1]$. We also show that for $k\le n/2$, $\Lam_k(n)$ equals, up to a factor of~$2$, the maximum number of incidences between $n$ points and $k$ unit circles with arbitrary centres.
+We then compare norms on the plane. $\Lam_k(n)=\Theta(kn)$ if the unit circle contains a segment; $\Lam_k(n)=O(n^{2/3}k^{2/3}+n)$ if the norm is strictly convex, and a norm found by Valtr attains this bound for every~$k$; by a theorem of Alon, Buci\'c and Sauermann, $\Lam_k(n)=\Theta(n)$ up to a logarithmic factor for all norms outside a meagre set. For the Euclidean norm the optimal error is $\Theta(n)$ when $\eps\ge n^{-1/2}$, a factor $1/\eps$ below the standard Laplace mechanism. It is polynomially larger than for these generic norms if and only if Erd\H{o}s's unit-distance conjecture fails, which was shown in 2026. Between these ranges the Euclidean question is an open problem on unbalanced unit-circle incidences.
 \end{abstract}
 
 %======================================================================
@@ -92,7 +95,7 @@ This paper studies a refinement of $u(n)$ that measures how unevenly unit distan
 \[
   \Lam_k(n)\;=\;\max\{S_k(P): |P|\le n\}.
 \]
-Thus $\Lam_1(n)=n-1$ (a point together with $n-1$ points on its unit circle), and $\Lam_n(n)=2u(n)$. In between, $\Lam_k(n)$ asks how many unit distances $k$ points can see.
+In this definition the $k$ points whose degrees are summed belong to $P$; the maximum is over all sets of at most $n$ distinct points. Thus $\Lam_1(n)=n-1$ for $n\ge2$ (a point together with $n-1$ points on its unit circle), and $\Lam_k(n)=2u(n)$ for $k\ge n$. In between, $\Lam_k(n)$ asks how many unit distances $k$ points can see.
 
 \subparagraph*{The privacy problem.}
 Our motivation comes from differential privacy. Suppose each point of $P$ is the location of one person, and we wish to publish the number $U(P)$ of unit-distance pairs. \emph{Node differential privacy} requires that adding or removing one person, together with all pairs that contain this person, changes the distribution of the published value by at most a factor $e^{\eps}$ (see \cref{sec:prelim} for a self-contained introduction). One point can form a unit-distance pair with all others, so the standard Laplace mechanism must add noise of order $n/\eps$. We ask for the \emph{minimax error}
@@ -113,18 +116,18 @@ The upper bound is attained by an algorithm that is $\eps$-node-private on all f
 The ingredients are known in the privacy literature: a bounded-degree surrogate for the edge count due to Kasiviswanathan, Nissim, Raskhodnikova and Smith~\cite{KNRS13}, and a lower bound by deleting and re-inserting high-degree vertices, which is closely related to the down-sensitivity analysis of Dong, Fang, Yi, Tao and Machanavajjhala~\cite{R2T22}. We do not claim these tools as new. What \cref{thm:reduction} adds is that, over a family closed under deletion, the worst-case cost is given by a single extremal function. This turns the privacy question into a question about point sets, which is the subject of the rest of the paper.
 
 \subparagraph*{Geometry of the top-degree mass.}
-The $k$ largest degrees of $G(P)$ count incidences between $P$ and the unit circles centred at $k$ points of~$P$. Let $I(n,k)$ be the maximum number of incidences between at most $n$ points and $k$ distinct unit circles (with arbitrary centres). Equivalently, $I(n,k)$ is the maximum number of unit distances between a set of $n$ points and a set of $k$ points.
+The $k$ largest degrees of $G(P)$ count incidences between $P$ and the unit circles centred at $k$ points of~$P$. We compare this with the same count for circles whose centres may lie anywhere. Let $I(n,k)$ be the maximum, over sets $B$ of at most $n$ points and sets $R$ of exactly $k$ points of $\R^2$, of the number of pairs $(b,r)\in B\times R$ with $\nrm{b-r}=1$. Equivalently, $I(n,k)$ is the maximum number of incidences between at most $n$ points and $k$ distinct unit circles $r+\mathbb S$, $r\in R$; distinct centres give distinct circles, and the sets $B$ and $R$ may intersect.
 
 \begin{restatable}[Top-degree mass and incidences]{theorem}{incidences}
 \label{thm:incidences}
 For every norm on $\R^2$ and all integers $n\ge2$ and $1\le k\le n$,
 \[
-  \max\Bigl\{n-1,\ \frac{2k\,u(n)}{n}\Bigr\}\;\le\;\Lam_k(n)\;\le\;I(n,k),
+  \max\Bigl\{n-1,\ \frac{2k\,u(n)}{n},\ I(n-k,k)\Bigr\}\;\le\;\Lam_k(n)\;\le\;I(n,k),
 \]
-where $u(n)$ is the maximum number of unit distances among $n$ points in this norm. If $k\le n/2$, then also $I(n,k)\le 2\Lam_k(n)$.
+where $u(n)$ is the maximum number of unit distances among $n$ points in this norm and $I(0,k)=0$. If $k\le n/2$, then also $I(n,k)\le 2\Lam_k(n)$.
 \end{restatable}
 
-Which values can $\Lam_k$ take? We answer this across all norms on $\R^2$. A norm is \emph{strictly convex} if its unit circle contains no segment. Valtr~\cite{Valtr05} found a strictly convex norm in which $n$ points can span $\Omega(n^{4/3})$ unit distances; we show that his norm is extremal for every~$k$, not only for $k=n$. Alon, Buci\'c and Sauermann~\cite{ABS23} proved that for almost all norms (in the sense of Baire category) every $n$ points span at most $n\log_2 n$ unit distances.
+Which values can $\Lam_k$ take? We compare norms on $\R^2$. A norm is \emph{strictly convex} if its unit circle contains no segment. Valtr~\cite{Valtr05} found a strictly convex norm in which $n$ points can span $\Omega(n^{4/3})$ unit distances; we use it in the form $\nrm{(x,y)}_V=|y|+\sqrt{x^2+y^2}$, whose unit ball $\{|y|\le(1-x^2)/2\}$ is a linear image of the ball $\{|y|+x^2\le1\}$ (a linear change of coordinates does not change $\Lam_k$). We show that this norm is extremal for every~$k$, not only for $k=n$. Alon, Buci\'c and Sauermann~\cite{ABS23} consider the space of all norms on $\R^d$ and prove that, outside a meagre subset of this space (``for almost all norms'' in the sense of Baire category), every $n$ points span at most $\frac d2 n\log_2 n$ unit distances. We call the norms outside such a meagre set \emph{generic}. This is a topological notion; it does not concern any particular norm, such as the Euclidean one.
 
 \begin{restatable}[Top-degree mass across norms]{theorem}{norms}
 \label{thm:norms}
@@ -132,16 +135,16 @@ There are absolute constants $C,c>0$ such that for all $n\ge 8$ and $1\le k\le n
 \begin{enumerate}
 \item If the unit circle contains a segment, then $\lfloor n/2\rfloor\min\{k,n-1\}\le\Lam_k(n)\le (n-1)k$.
 \item If the norm is strictly convex, then $\Lam_k(n)\le C\,(n^{2/3}k^{2/3}+n)$.
-\item For Valtr's norm $\nrm{(x,y)}=|y|+\sqrt{x^2+y^2}$, we have $\Lam_k(n)\ge c\,(n^{2/3}k^{2/3}+n)$.
-\item For almost all norms, $n-1\le\Lam_k(n)\le 2n\log_2 n$.
+\item For Valtr's norm $\nrm{\cdot}_V$, we have $\Lam_k(n)\ge c\,(n^{2/3}k^{2/3}+n)$.
+\item For every norm outside a meagre set of norms (in the sense of~\cite{ABS23}), $n-1\le\Lam_k(n)\le 2n\log_2 n$.
 \end{enumerate}
 \end{restatable}
 
-Since every norm is either strictly convex or has a segment on its unit circle, \cref{thm:reduction,thm:norms} describe the worst possible privacy cost over all norms.
+Every norm is either strictly convex or has a segment on its unit circle, so parts (1) and (2) give an upper bound on $\Lam_k(n)$ for every norm. Part~(1) is tight for every norm with a segment. Part~(3) shows only that the bound in part~(2) is the best one that follows from strict convexity alone: an individual strictly convex norm, such as the Euclidean norm, may have a much smaller $\Lam_k(n)$. Part~(4) concerns generic norms only.
 
 \begin{restatable}[Privacy cost across norms]{corollary}{normsprivacy}
 \label{cor:norms-privacy}
-For $n\ge8$ and $1/(n-1)\le\eps\le1$, the minimax error $\errs(\eps,n)$ is $\Theta(n/\eps)$ if the unit circle contains a segment, so the Laplace mechanism is optimal; it is $O(n+n^{2/3}\eps^{-2/3})$ for every strictly convex norm, with equality up to constants for Valtr's norm; and it lies between $\Omega(n)$ and $O(n\log n)$ for almost all norms.
+Let $n\ge8$ and $1/(n-1)\le\eps\le1$. If the unit circle contains a segment, then $\errs(\eps,n)=\Theta(n/\eps)$, so the Laplace mechanism is optimal. For every strictly convex norm, $\errs(\eps,n)=O(n+n^{2/3}\eps^{-2/3})$, and for Valtr's norm also $\errs(\eps,n)=\Omega(n+n^{2/3}\eps^{-2/3})$. For every generic norm, $(n-1)/(8(1+e))\le\errs(\eps,n)\le4n\log_2n$; this holds for all $n\ge2$ and $\eps\in(0,1]$.
 \end{restatable}
 
 \subparagraph*{The Euclidean plane.}
@@ -158,7 +161,7 @@ In particular $\errs(\eps,n)=\Theta(n)$ for $\eps\ge n^{-1/2}$. Moreover, the fo
 \item $u(n)\ge n^{1+\delta}$ for some $\delta>0$ and infinitely many $n$;
 \item there are $\delta'>0$ and privacy levels $\eps_n\in(0,1]$ such that $\errs(\eps_n,n)\ge n^{1+\delta'}$ for infinitely many $n$.
 \end{enumerate}
-By the 2026 results, both hold: for every $\eta\in[0,0.014)$ there are infinitely many $n$ with $\errs(n^{-1+\eta},n)\ge c\,n^{1.014-\eta}$, while for almost all norms the error is $O(n\log n)$ at every~$\eps$.
+By the 2026 results, both hold: for every $\eta\in[0,0.014)$ there are infinitely many $n$ with $\errs(n^{-1+\eta},n)\ge c\,n^{1.014-\eta}$, while for every generic norm the error is at most $4n\log_2 n$ at every~$\eps$.
 \end{restatable}
 
 \Cref{fig:rates} shows the resulting picture. For the Euclidean norm, the region between the two bounds of \cref{thm:euclid} is open. By \cref{thm:incidences}, closing it is the same as determining $I(n,k)$ for unit circles when $\sqrt n\le k\le n$, an unbalanced version of the unit-distance problem. At $k=n$ this is the unit-distance problem itself; \cref{thm:norms}(3) shows that any improvement over the incidence bound must use properties of the Euclidean norm that Valtr's norm does not have. We state the question in \cref{sec:open}.
@@ -180,7 +183,7 @@ By the 2026 results, both hold: for every $\eta\in[0,0.014)$ there are infinitel
   \draw[thick,dotted] (0.94,0) -- (1,0.06) node[right] {\small Euclidean lower bound};
   \fill (1,0.06) circle (0.6pt);
   \draw[very thick] (0,0) -- (1,0);
-  \node[above] at (0.25,0.0) {\small almost all norms};
+  \node[above] at (0.25,0.0) {\small generic norms};
 \end{tikzpicture}
 \caption{Exponent of the optimal error against $\log_n(1/\eps)$. Shaded: the range allowed for the Euclidean norm by \cref{thm:euclid}; its lower edge is drawn with $\delta=0.06$, while the best known value is $\delta\ge0.014$.}
 \label{fig:rates}
@@ -197,7 +200,7 @@ Result & Statement & Status \\
 \midrule
 \Cref{thm:reduction} & $\errs(\eps,n)=\Theta(\Lam_{\lceil1/\eps\rceil}(n))$ & known tools; new form \\
 \Cref{thm:incidences} & $\Lam_k(n)$ and $I(n,k)$ agree up to a factor $2$ ($k\le n/2$) & new (short) \\
-\Cref{thm:norms}(1),(4) & segment norms; almost all norms & new; uses \cite{ABS23} \\
+\Cref{thm:norms}(1),(4) & segment norms; generic norms & new; uses \cite{ABS23} \\
 \Cref{thm:norms}(2) & strictly convex norms & known incidence bound \\
 \Cref{thm:norms}(3) & Valtr's norm is extremal for every $k$ & new; extends \cite{Valtr05} \\
 \Cref{thm:euclid} & Euclidean window; separation iff $u(n)\ge n^{1+\Omega(1)}$ & new connection \\
@@ -226,7 +229,7 @@ For the lower bound, take a set $P^\star$ with $S_k(P^\star)=\Lam_k(n)$, where n
 If $C$ is the set of $k$ points of largest degree in $P$, then $S_k(P)$ is the number of incidences between $P$ and the unit circles centred at points of $C$. Conversely, given $n$ points and $k$ unit circles, adding the $k$ centres to the point set turns incidences into degrees. Splitting the points into two halves keeps the total size below~$n$ at a loss of a factor~$2$.
 
 \subparagraph*{Why the norms differ.}
-If the unit circle contains a segment, two parallel rows of points give a complete bipartite unit-distance graph, so $\Lam_k(n)=\Theta(kn)$. If the norm is strictly convex, two distinct unit circles meet in at most two points and two points lie on at most two unit circles; the crossing-number argument then gives $I(n,k)=O(n^{2/3}k^{2/3}+n+k)$. For Valtr's norm, the upper half of each unit circle is a parabolic arc, and the map $(x,y)\mapsto(x,y+x^2/2)$ sends all these arcs to segments of lines. The standard grid construction for point--line incidences, at the right aspect ratio, then gives $I(n,k)=\Omega(n^{2/3}k^{2/3})$ for every $\sqrt n\le k\le n$. For almost all norms the bound of~\cite{ABS23} on $u(n)$ caps $\Lam_k(n)\le 2u(n)$.
+If the unit circle contains a segment, two parallel rows of points give a complete bipartite unit-distance graph, so $\Lam_k(n)=\Theta(kn)$. If the norm is strictly convex, two distinct unit circles meet in at most two points and two points lie on at most two unit circles; the crossing-number argument then gives $I(n,k)=O(n^{2/3}k^{2/3}+n+k)$. For Valtr's norm, the upper half of each unit circle is a parabolic arc, and the map $(x,y)\mapsto(x,y+x^2/2)$ sends all these arcs to segments of lines. The standard grid construction for point--line incidences, at the right aspect ratio, then gives an exact count of unit distances (\cref{lem:valtr-grid}) and $\Lam_k(n)=\Omega(n^{2/3}k^{2/3})$ for every $\sqrt n\le k\le n$. For generic norms the bound of~\cite{ABS23} on $u(n)$ caps $\Lam_k(n)\le 2u(n)$.
 
 \subparagraph*{Why the 2026 result enters.}
 The averaging bound $\Lam_k(n)\ge 2k\,u(n)/n$ holds because the $k$ largest of $n$ degrees have at least the average degree. With $k=\lceil 1/\eps\rceil$ close to $n$, \cref{thm:reduction} turns a superlinear $u(n)$ into a superlinear privacy cost. Conversely $\Lam_k(n)\le\Lam_n(n)=2u(n)$, so no other source of superlinear cost exists.
@@ -276,7 +279,7 @@ For a graph $G$ and a real number $D\ge0$, let
 \[
   g_D(G)=\max\Bigl\{\sum_{e\in E(G)}x_e:\ 0\le x_e\le1,\ \sum_{e\ni v}x_e\le D\ \text{for every vertex }v\Bigr\}.
 \]
-This is the value of the flow statistic of~\cite{KNRS13}, written as a fractional degree-constrained subgraph (\cref{app:surrogates}). We write $g_D(P)$ for $g_D(G(P))$.
+It equals one half of the maximum-flow value in the network of Kasiviswanathan, Nissim, Raskhodnikova and Smith~\cite{KNRS13} (\cref{prop:flow-lp} in \cref{app:surrogates}). We write $g_D(P)$ for $g_D(G(P))$.
 
 \begin{lemma}
 \label{lem:surrogate}
@@ -325,9 +328,11 @@ The algorithm needs the value $\Lam_k(n)$. If only an upper bound $\lambda\ge\La
 \begin{proof}
 \emph{Lower bounds.} Placing $n-1$ points on the unit circle around a further point gives $S_1\ge n-1$. If $|P|=n$ and $U(P)=u(n)$, the average degree is $2u(n)/n$, and the $k$ largest degrees have at least this average, so $S_k(P)\ge 2k\,u(n)/n$.
 
-\emph{$\Lam_k(n)\le I(n,k)$.} Let $P\in\cP_n$ and let $C$ be a set of $\min\{k,|P|\}$ points of $P$ of largest degree. The unit circles $c+\mathbb S$, $c\in C$, are distinct, and $S_k(P)=\sum_{c\in C}|P\cap(c+\mathbb S)|=I(P,\{c+\mathbb S\}_{c\in C})\le I(n,k)$.
+\emph{$\Lam_k(n)\le I(n,k)$.} Let $P\in\cP_n$ and let $C$ be a set of $\min\{k,|P|\}$ points of $P$ of largest degree. Then $S_k(P)=\sum_{c\in C}|P\cap(c+\mathbb S)|$. If $|C|<k$, add $k-|C|$ further centres far from $P$; this does not change the count, so $S_k(P)\le I(n,k)$.
 
-\emph{$I(n,k)\le2\Lam_k(n)$ for $k\le n/2$.} Let $B$ be a set of at most $n$ points, $R$ a set of $k$ centres, and $\Gamma_R=\{r+\mathbb S\}_{r\in R}$. Split $B$ into two parts of at most $\lceil n/2\rceil$ points each, and let $B'$ be a part with $I(B',\Gamma_R)\ge I(B,\Gamma_R)/2$. The set $Q=B'\cup R$ has at most $\lceil n/2\rceil+k\le n$ points. Each $r\in R$ has $\deg_Q(r)\ge|B'\cap(r+\mathbb S)|$, hence $\Lam_k(n)\ge S_k(Q)\ge\sum_{r\in R}\deg_Q(r)\ge I(B,\Gamma_R)/2$.
+\emph{$I(n-k,k)\le\Lam_k(n)$.} Let $B$ have at most $n-k$ points and let $R$ be a set of $k$ centres. The set $Q=B\cup R$ has at most $n$ points, and each $r\in R$ satisfies $\deg_Q(r)\ge|B\cap(r+\mathbb S)|$, because $r\notin r+\mathbb S$. Since $S_k(Q)$ is at least the sum of the degrees of any $k$ points of $Q$, $\Lam_k(n)\ge S_k(Q)\ge\sum_{r\in R}|B\cap(r+\mathbb S)|$.
+
+\emph{$I(n,k)\le2\Lam_k(n)$ for $k\le n/2$.} Let $B$ be a set of at most $n$ points, $R$ a set of $k$ centres, and $\Gamma_R=\{r+\mathbb S\}_{r\in R}$. Split $B$ into two parts of at most $\lceil n/2\rceil$ points each, and let $B'$ be a part with $I(B',\Gamma_R)\ge I(B,\Gamma_R)/2$. Since $|B'|\le\lceil n/2\rceil\le n-k$, the previous paragraph gives $\Lam_k(n)\ge I(B',\Gamma_R)\ge I(B,\Gamma_R)/2$.
 \end{proof}
 
 \Cref{lem:tail} also bounds the degree tail of every set by the top-degree mass. With \cref{thm:norms}(2) this gives, for every strictly convex norm,
@@ -367,26 +372,37 @@ In a strictly convex norm, two distinct unit circles meet in at most two points,
     }
   \end{scope}
 \end{tikzpicture}
-\caption{Left: three unit circles of Valtr's norm, each bounded by two parabolic arcs. Right: the map $\Phi(x,y)=(x,y+x^2/2)$ sends the upper arcs (bold) to line segments whose slope is the first coordinate of the centre. Point sets with many point--line incidences therefore yield many unit distances.}
+\caption{Left: three unit circles of Valtr's norm, each bounded by two parabolic arcs. Right: the map $\Phi(x,y)=(x,y+x^2/2)$ sends the upper arcs (bold) to line segments whose slope is the first coordinate of the centre. Point sets with many point--line incidences therefore yield many unit distances (\cref{lem:valtr-grid}).}
 \label{fig:valtr}
 \end{figure}
 
-\begin{proof}[Proof of (3)]
-The norm $\nrm{(x,y)}=|y|+\sqrt{x^2+y^2}$ is the sum of the Euclidean norm and a seminorm, so it is strictly convex~\cite{Valtr05,Swanepoel18}. For a centre $c=(a,b)$ and a point $p=(x,y)$ with $y\ge b$, the equation $\nrm{p-c}=1$ is equivalent to
+\begin{lemma}[Valtr grid]
+\label{lem:valtr-grid}
+Let $A,B\ge1$ be integers. For $1\le i\le A$, $1\le j\le 2AB$, $1\le s\le B$ and $1\le t\le AB$ put
 \[
-  y=b+\tfrac12\bigl(1-(x-a)^2\bigr),\qquad |x-a|\le1 .
+  p_{ij}=\Bigl(\frac{i}{2A},\ \frac{j}{4AB}-\frac{i^2}{8A^2}\Bigr),
+  \qquad
+  c_{st}=\Bigl(\frac{s}{2B},\ \frac{t}{4AB}-\frac12+\frac{s^2}{8B^2}\Bigr).
 \]
-The bijection $\Phi(x,y)=(x,\,y+x^2/2)$ (\cref{fig:valtr}) maps this arc into the line $Y=aX+(b+\frac12-\frac{a^2}2)$. Conversely, every point $(X,Y)$ with $|X-a|\le1$ on the line $Y=aX+\beta$ is the image of a point at unit distance from the centre $(a,\beta-\frac12+\frac{a^2}2)$.
+The $2A^2B$ points $p_{ij}$ are distinct, the $AB^2$ centres $c_{st}$ are distinct, no point equals a centre, and $\nrm{p_{ij}-c_{st}}_V=1$ holds if and only if $j=si+t$. In particular, exactly $A^2B^2$ point--centre pairs are at unit distance.
+\end{lemma}
 
-Now use the grid construction for point--line incidences. For integers $A,B\ge1$, the $2A^2B$ points $(i,j)$ with $1\le i\le A$, $1\le j\le 2AB$ and the $AB^2$ lines $j=si+t$ with $1\le s\le B$, $1\le t\le AB$ have $A^2B^2$ incidences, since each line contains $A$ of the points. Apply $(i,j)\mapsto(\frac{i}{2A},\frac{j}{4AB})$: the lines get slopes $a=\frac{s}{2B}\in(0,\frac12]$, and all points have $X\in(0,\frac12]$, so $|X-a|\le1$. Applying $\Phi^{-1}$ to the points and taking the centres described above yields $2A^2B$ points and $AB^2$ distinct centres with at least $A^2B^2$ pairs at unit distance. Choosing $A$ and $B$ for given $n$ and $k$ (\cref{app:geometry}) gives $I(\lfloor n/2\rfloor,k)\ge n^{2/3}k^{2/3}/53$ for $\sqrt n\le k\le\lfloor n/2\rfloor$. By \cref{thm:incidences} and monotonicity this gives (3), with $\Lam_k(n)\ge n-1$ for $k<\sqrt n$.
+\begin{proof}
+For $d=(d_x,d_y)$ we have $\nrm{d}_V=1$ if and only if $\sqrt{d_x^2+d_y^2}=1-|d_y|$, that is, if and only if $d_x^2=1-2|d_y|$. Every point has second coordinate at least $\frac1{4AB}-\frac18>-\frac18$, and every centre has second coordinate at most $\frac14-\frac12+\frac18=-\frac18$. Hence no point equals a centre, and for $d=p_{ij}-c_{st}$ we have $d_y>0$. Write $x=\frac{i}{2A}$ and $a=\frac{s}{2B}$. Then $1-2d_y=x^2+a^2-\frac{2j}{4AB}+\frac{2t}{4AB}$ and $d_x^2=x^2-2ax+a^2$, so $\nrm{d}_V=1$ if and only if $\frac{j}{4AB}=ax+\frac{t}{4AB}$, that is, $j=si+t$. For each of the $AB^2$ pairs $(s,t)$ and each $i\le A$, the value $si+t$ lies in $[2,2AB]$, so it is a valid index $j$. This gives exactly $A\cdot AB^2$ pairs. Distinctness is clear from the coordinates.
+\end{proof}
+
+In terms of \cref{fig:valtr}: the map $\Phi$ sends $p_{ij}$ to the grid point $(\frac{i}{2A},\frac{j}{4AB})$ and the upper arc of $c_{st}+\mathbb S$ into the line of slope $\frac{s}{2B}$ and intercept $\frac{t}{4AB}$, so the lemma is the standard grid example for point--line incidences~\cite{SzemerediTrotter83}. The lower arcs carry no incidences, since every point lies above every centre.
+
+\begin{proof}[Proof of (3)]
+The norm $\nrm{\cdot}_V$ is the sum of the Euclidean norm and the seminorm $|y|$, so it is strictly convex. Let $m=\lfloor n/2\rfloor$. If $\sqrt n\le k\le m$, choose $A,B\ge1$ with $2A^2B\le m$, $AB^2\le k$ and $A^2B^2\ge n^{2/3}k^{2/3}/53$ (\cref{app:geometry}). The set $Q$ of all points and centres of \cref{lem:valtr-grid} has at most $m+k\le n$ elements, and $S_k(Q)$ is at least the sum of the degrees of the $AB^2\le k$ centres, which is at least $A^2B^2$. The cases $k<\sqrt n$ (where $\Lam_k(n)\ge n-1$) and $k>m$ (by monotonicity in $k$) are treated in \cref{app:geometry}.
 \end{proof}
 
 \begin{proof}[Proof of (4)]
-Alon, Buci\'c and Sauermann~\cite{ABS23} prove that for all norms on $\R^2$ outside a meagre set, every $n$ points span at most $n\log_2 n$ unit distances. Then $\Lam_k(n)\le\Lam_n(n)=2u(n)\le2n\log_2 n$. The lower bound $n-1$ holds in every norm.
+By~\cite{ABS23} with $d=2$, for every norm outside a meagre set and every $n$, every $n$ points span at most $n\log_2 n$ unit distances. Then $\Lam_k(n)\le\Lam_n(n)=2u(n)\le2n\log_2 n$. The lower bound $n-1$ holds in every norm.
 \end{proof}
 
 \begin{proof}[Proof of \cref{cor:norms-privacy}]
-Let $k=\lceil1/\eps\rceil\le n-1$ and apply \cref{thm:reduction}. With a segment, $\Lam_k(n)\ge\lfloor n/2\rfloor/\eps$, and the standard Laplace mechanism has error $(n-1)/\eps$. For strictly convex norms, (2) gives $2\Lam_k(n)=O(n+n^{2/3}k^{2/3})$ and $k\le 2/\eps$; (3) gives the matching lower bound for Valtr's norm. For almost all norms, (4) gives $\Omega(n)$ and $O(n\log n)$.
+Let $k=\lceil1/\eps\rceil\le n-1$ and apply \cref{thm:reduction}. With a segment, $\Lam_k(n)\ge\lfloor n/2\rfloor/\eps$, and the standard Laplace mechanism has error $(n-1)/\eps$. For strictly convex norms, (2) gives $2\Lam_k(n)=O(n+n^{2/3}k^{2/3})$ and $k\le 2/\eps$; (3) gives the matching lower bound for Valtr's norm. For generic norms, \cref{thm:reduction} and (4) give $(n-1)/(8(1+e))\le\errs(\eps,n)\le2\Lam_k(n)\le4n\log_2n$ for every $\eps\in(0,1]$.
 \end{proof}
 
 \euclid*
@@ -394,7 +410,7 @@ Let $k=\lceil1/\eps\rceil\le n-1$ and apply \cref{thm:reduction}. With a segment
 \begin{proof}
 Let $k=\lceil1/\eps\rceil$, so $1/\eps\le k\le\min\{n,2/\eps\}$. By \cref{thm:reduction,thm:incidences}, $\errs(\eps,n)\ge\frac{1}{8(1+e)}\max\{n-1,2u(n)/(\eps n)\}$. The upper bound follows from \cref{thm:reduction,thm:norms}(2). For $\eps\ge n^{-1/2}$ we have $n^{2/3}\eps^{-2/3}\le n$.
 
-For the equivalence, if $u(n)\ge n^{1+\delta}$ then at $\eps=1/n$ the lower bound is at least $c\,u(n)\ge c\,n^{1+\delta}$, which exceeds $n^{1+\delta/2}$ for large~$n$. Conversely, $\errs(\eps,n)\le2\Lam_k(n)\le2\Lam_n(n)=4u(n)$ for every $\eps$, so a lower bound $n^{1+\delta'}$ on the error forces $u(n)\ge n^{1+\delta'}/4$. Finally, Sawin~\cite{Sawin2026} gives $u(n)>n^{1.014}$ for infinitely many $n$; for these $n$ and $\eps=n^{-1+\eta}$ the lower bound is at least $c\,n^{-\eta}u(n)\ge c\,n^{1.014-\eta}$. The comparison with almost all norms is \cref{cor:norms-privacy}.
+For the equivalence, if $u(n)\ge n^{1+\delta}$ then at $\eps=1/n$ the lower bound is at least $c\,u(n)\ge c\,n^{1+\delta}$, which exceeds $n^{1+\delta/2}$ for large~$n$. Conversely, $\errs(\eps,n)\le2\Lam_k(n)\le2\Lam_n(n)=4u(n)$ for every $\eps$, so a lower bound $n^{1+\delta'}$ on the error forces $u(n)\ge n^{1+\delta'}/4$. Finally, Sawin~\cite{Sawin2026} gives $u(n)>n^{1.014}$ for infinitely many $n$; for these $n$ and $\eps=n^{-1+\eta}$ the lower bound is at least $c\,n^{-\eta}u(n)\ge c\,n^{1.014-\eta}$. The comparison with generic norms is \cref{cor:norms-privacy}.
 \end{proof}
 
 \subparagraph*{What the separation does and does not say.}
@@ -436,6 +452,9 @@ with $\delta^\star\ge0.014$, and for Valtr's norm the upper bound is attained. I
 
 \subparagraph*{Higher dimensions.}
 In $\R^3$, $u(n)$ lies between $n^{4/3}\log\log n$~\cite{BrassMoserPach05} and $n^{295/197+o(1)}$~\cite{Zahl19}, so the window is wider and both ends are open. In $\R^d$ with $d\ge4$, points on two orthogonal circles of radius $1/\sqrt2$ form a complete bipartite unit-distance graph, as in \cref{thm:norms}(1), and the standard Laplace mechanism is optimal.
+
+\subparagraph*{Use of generative AI.}
+A generative AI assistant (Claude, Anthropic) was used to draft the text and \LaTeX{} source of this version, to propose and check proof arguments, and to run numerical sanity checks of \cref{lem:surrogate,lem:valtr-grid}. Parts of the appendix are adapted from an earlier draft whose language was edited with OpenAI Codex. \textcolor{red}{[Authors: state the extent of human review here, e.g.\ that all statements and proofs were verified and the text rewritten by the authors, who take full responsibility for the content.]}
 
 %======================================================================
 \bibliography{refs}
@@ -481,9 +500,15 @@ With $D'=\lceil\Lam_k(n)/k\rceil$ in place of $D$ in the proof of \cref{thm:redu
 \section{The adaptive algorithm}
 \label{app:adaptive}
 
-Let $\mathcal D=\{1,2,4,\dots,2^{K-1}\}$ with $K=1+\lceil\log_2 n\rceil$, so $\max\mathcal D\ge n-1$. Fix $\beta\in(0,\frac12)$, split $\eps=\eps_1+\eps_2$ with $\eps_1=\eps_2=\eps/2$, and let $a=\log(2/\beta)$.
+In this appendix $\log$ is the natural logarithm. Let $\mathcal D=\{1,2,4,\dots,2^{K-1}\}$ with $K=1+\lceil\log_2 n\rceil$, so $\max\mathcal D\ge n-1$. Fix $\beta\in(0,\frac12)$, split $\eps=\eps_1+\eps_2$ with $\eps_1=\eps_2=\eps/2$, and let $a=\log(2/\beta)$.
 
-\subparagraph*{Algorithm.} Run the generalized exponential mechanism of Raskhodnikova and Smith~\cite[Theorem~1.4]{RS16} with privacy parameter $\eps_1$ on the scores $q_D(P)=-g_D(P)+aD/\eps_2$, $D\in\mathcal D$, where score $q_D$ is declared to have sensitivity $D$; let $\widehat D$ be the output. Release $g_{\widehat D}(P)+Z$ with $Z$ Laplace of scale $\widehat D/\eps_2$.
+\subparagraph*{The selection tool.} The generalized exponential mechanism~\cite{RS16} of Raskhodnikova and Smith takes $K$ candidates with score functions $q_1,\dots,q_K$, which are to be minimized; $q_i$ has sensitivity at most $\Delta_i$. The mechanism is $\eps'$-differentially private, and for every $\beta'\in(0,1)$, with probability at least $1-\beta'$ its output $\hat\imath$ satisfies
+\[
+  q_{\hat\imath}\le\min_i\bigl(q_i+4\Delta_i\log(K/\beta')/\eps'\bigr).
+\]
+We use only this guarantee.
+
+\subparagraph*{Algorithm.} Run the generalized exponential mechanism with privacy parameter $\eps_1$ on the scores $q_D(P)=-g_D(P)+aD/\eps_2$, $D\in\mathcal D$, where score $q_D$ is declared to have sensitivity $D$; let $\widehat D$ be the output. Release $g_{\widehat D}(P)+Z$ with $Z$ Laplace of scale $\widehat D/\eps_2$.
 
 \begin{lemma}
 \label{lem:adaptive-oracle}
@@ -491,7 +516,7 @@ The algorithm is $\eps$-node-private. With probability at least $1-\beta$ its er
 \end{lemma}
 
 \begin{proof}
-Each score $q_D$ has sensitivity at most $D$ by \cref{lem:surrogate}(a), since $aD/\eps_2$ does not depend on $P$. The selection step is $\eps_1$-node-private by~\cite[Theorem~1.4]{RS16}, the release step is $\eps_2$-node-private given $\widehat D$, and the composition is $\eps$-node-private. By~\cite[Theorem~1.4]{RS16}, with probability at least $1-\beta/2$, $q_{\widehat D}(P)\le\min_D\{q_D(P)+4D\log(2K/\beta)/\eps_1\}$. With probability at least $1-\beta/2$, $|Z|\le a\widehat D/\eps_2$. On both events,
+Each score $q_D$ has sensitivity at most $D$ by \cref{lem:surrogate}(a), since $aD/\eps_2$ does not depend on $P$. The selection step is $\eps_1$-node-private by the guarantee above, the release step is $\eps_2$-node-private given $\widehat D$, and the composition is $\eps$-node-private. By the guarantee above with $\beta'=\beta/2$, with probability at least $1-\beta/2$, $q_{\widehat D}(P)\le\min_D\{q_D(P)+4D\log(2K/\beta)/\eps_1\}$. With probability at least $1-\beta/2$, $|Z|\le a\widehat D/\eps_2$. On both events,
 \[
   |g_{\widehat D}(P)+Z-U(P)|\le U(P)-g_{\widehat D}(P)+a\widehat D/\eps_2=U(P)+q_{\widehat D}(P),
 \]
@@ -533,8 +558,16 @@ There is an absolute constant $C_0$ such that for every strictly convex norm, ev
 This is the argument of Sz\'ekely~\cite{Szekely97}. Let $N=|P|$ and $m=|\Gamma|$. Draw a multigraph $H$ on $P$: for every $\gamma\in\Gamma$ containing $j\ge2$ points of $P$, join consecutive points along $\gamma$ by the $j$ arcs between them. Then $H$ has at least $I(P,\Gamma)-m$ edges. By \cref{lem:pseudo}, two points are joined by arcs of at most two circles, and each circle contributes at most two such arcs, so every edge has multiplicity at most~$4$. Two arcs of the same circle do not cross, and two circles meet in at most two points, so the drawing has at most $m^2$ crossings. The crossing lemma for multigraphs with bounded multiplicity~\cite{Szekely97} states that a multigraph with $N$ vertices, $e$ edges and multiplicity at most $\mu$ has crossing number at least $c_1e^3/(\mu N^2)$ whenever $e\ge c_2\mu N$, for absolute constants $c_1,c_2>0$. Hence either $I(P,\Gamma)-m<4c_2N$ or $m^2\ge c_1(I(P,\Gamma)-m)^3/(4N^2)$, and in both cases the claim follows.
 \end{proof}
 
-\begin{proof}[Choice of parameters in \cref{thm:norms}(3)]
-Let $n\ge8$, $m=\lfloor n/2\rfloor\ge4$ and $\sqrt n\le k\le m$. Put $A_0=(m/2)^{2/3}k^{-1/3}$ and $B_0=k^{2/3}(m/2)^{-1/3}$, so that $2A_0^2B_0=m$ and $A_0B_0^2=k$. Since $k\le m$ and $m\ge4$ we have $(m/2)^2\ge k$, so $A_0\ge1$; since $k^2\ge n\ge m/2$ we have $B_0\ge1$. Let $A=\lfloor A_0\rfloor\ge A_0/2$ and $B=\lfloor B_0\rfloor\ge B_0/2$. The construction in the proof of \cref{thm:norms}(3) uses at most $m$ points and at most $k$ centres and has at least $A^2B^2\ge A_0^2B_0^2/16=(mk/2)^{2/3}/16$ incidences. Since $m\ge n/3$, this is at least $(nk/6)^{2/3}/16\ge n^{2/3}k^{2/3}/53$. By \cref{thm:incidences} (the set $Q$ in its proof has at most $m+k\le n$ points), $\Lam_k(n)\ge n^{2/3}k^{2/3}/53$. For $m<k\le n$, monotonicity gives $\Lam_k(n)\ge\Lam_m(n)\ge n^{2/3}m^{2/3}/53\ge n^{2/3}k^{2/3}/111$, using $m\ge n/3\ge k/3$ and $m\ge\sqrt n$. For $k<\sqrt n$, $\Lam_k(n)\ge n-1\ge n/2\ge n^{2/3}k^{2/3}/2$. Hence (3) holds with $c=1/222$.
+\begin{proof}[Completion of the proof of \cref{thm:norms}(3)]
+Let $n\ge8$ and $m=\lfloor n/2\rfloor\ge4$, so $n/3\le m$ and $\sqrt n\le m$.
+
+\emph{Case $\sqrt n\le k\le m$.} Put $A_0=(m/2)^{2/3}k^{-1/3}$ and $B_0=k^{2/3}(m/2)^{-1/3}$, so that $2A_0^2B_0=m$ and $A_0B_0^2=k$. Since $k\le m$ and $m\ge4$ we have $(m/2)^2\ge m\ge k$, so $A_0\ge1$; since $k^2\ge n\ge m/2$ we have $B_0\ge1$. Let $A=\lfloor A_0\rfloor\ge A_0/2$ and $B=\lfloor B_0\rfloor\ge B_0/2$. Then $2A^2B\le m$, $AB^2\le k$, and $A^2B^2\ge A_0^2B_0^2/16=(mk/2)^{2/3}/16\ge(nk/6)^{2/3}/16\ge n^{2/3}k^{2/3}/53$. Let $Q$ be the union of the $2A^2B$ points and the $AB^2$ centres of \cref{lem:valtr-grid}; it has at most $m+k\le n$ elements. The $AB^2\le k$ centres have total degree in $G(Q)$ at least $A^2B^2$, so $\Lam_k(n)\ge S_k(Q)\ge n^{2/3}k^{2/3}/53$.
+
+\emph{Case $m<k\le n$.} By monotonicity in $k$ and the previous case with $k=m$, $\Lam_k(n)\ge\Lam_m(n)\ge n^{2/3}m^{2/3}/53\ge n^{2/3}k^{2/3}/111$, since $m\ge n/3\ge k/3$.
+
+\emph{Case $k<\sqrt n$.} Here $\Lam_k(n)\ge n-1\ge n/2\ge n^{2/3}k^{2/3}/2$.
+
+In all cases $\Lam_k(n)\ge\max\{n^{2/3}k^{2/3}/111,\ n/2\}\ge(n^{2/3}k^{2/3}+n)/222$, so (3) holds with $c=1/222$.
 \end{proof}
 
 %----------------------------------------------------------------------

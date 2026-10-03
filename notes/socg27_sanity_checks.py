@@ -84,3 +84,23 @@ for _ in range(200):
     mx = max(mx, count_cross((0, 0), c2))
 print("max sign changes between two translates:", mx)
 assert mx <= 2
+
+# 5. Exact statement for the Valtr grid (Lemma "Valtr grid" in the draft):
+#    blue set B (2A^2B points) and red set R (AB^2 centres) are disjoint, every blue point lies
+#    strictly above every red centre, and EXACTLY A^2 B^2 pairs (b, r) in B x R are at unit distance.
+#    Exact test in rationals: ||(dx,dy)|| = 1  <=>  dx^2 = 1 - 2|dy|.
+def unit(p, q):
+    dx, dy = p[0]-q[0], p[1]-q[1]
+    return dx*dx == 1 - 2*abs(dy)
+for A in range(1, 6):
+    for B in range(1, 6):
+        pts, cen = valtr(A, B)
+        assert not (set(pts) & set(cen))
+        assert min(y for _, y in pts) > max(b for _, b in cen)
+        br = sum(1 for p in pts for c in cen if unit(p, c))
+        bb = sum(1 for i, p in enumerate(pts) for q in pts[i+1:] if unit(p, q))
+        rr = sum(1 for i, p in enumerate(cen) for q in cen[i+1:] if unit(p, q))
+        assert br == A*A*B*B, (A, B, br)
+        if A <= 3 and B <= 3:
+            print(f"A={A} B={B}: blue-red={br} (=A^2B^2), blue-blue={bb}, red-red={rr}")
+print("Valtr grid: blue-red count is exactly A^2 B^2 for all 1 <= A,B <= 5")
