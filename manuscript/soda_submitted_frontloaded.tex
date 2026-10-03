@@ -1,0 +1,838 @@
+\documentclass[11pt]{article}
+
+\usepackage[margin=1in]{geometry}
+\usepackage{amsmath,amssymb,amsthm,mathtools}
+\usepackage{enumitem}
+\usepackage{hyperref}
+\usepackage{xcolor}
+\usepackage{microtype}
+
+\hypersetup{
+  colorlinks=true,
+  linkcolor=blue!60!black,
+  citecolor=blue!60!black,
+  urlcolor=blue!60!black
+}
+
+\newtheorem{theorem}{Theorem}[section]
+\newtheorem{lemma}[theorem]{Lemma}
+\newtheorem{corollary}[theorem]{Corollary}
+\newtheorem{proposition}[theorem]{Proposition}
+\newtheorem{definition}[theorem]{Definition}
+\newtheorem{remark}[theorem]{Remark}
+
+\DeclareMathOperator{\disc}{disc}
+\DeclareMathOperator{\herdisc}{herdisc}
+\DeclareMathOperator{\Lap}{Lap}
+\DeclareMathOperator{\poly}{poly}
+
+\newcommand{\R}{\mathbb{R}}
+\newcommand{\Z}{\mathbb{Z}}
+\newcommand{\eps}{\varepsilon}
+\newcommand{\calD}{\mathcal{D}}
+\newcommand{\calP}{\mathcal{P}}
+\newcommand{\calC}{\mathcal{C}}
+\newcommand{\calE}{\mathcal{E}}
+\newcommand{\calG}{\mathcal{G}}
+\newcommand{\tail}{\operatorname{tail}}
+\newcommand{\dd}{\mathrm{d}}
+
+\title{Node-Private Edge Counting in Distance Graphs via Incidence Geometry}
+\author{Anonymous Authors}
+\date{}
+
+\begin{document}
+\pagenumbering{roman}
+\begin{titlepage}
+\maketitle
+
+\begin{abstract}
+We study node-differentially private algorithms for counting edges in geometric distance graphs, focusing on exact-distance counts and recording bounded-degree consequences for quantized and separated variants. Given a planar point set \(P\), the exact-distance graph connects pairs at a prescribed distance. Under node privacy, the worst-case sensitivity of an edge count is \(\Theta(n)\), although the relevant local degree structure can be much smaller on a given input. The algorithmic question is whether one can obtain error controlled by that degree structure rather than by the worst-case sensitivity. Our first contribution is a canonical degree-bounded approximation to edge count. For any graph \(G\), let \(f_D(G)\) be the maximum number of edges in a subgraph of \(G\) of maximum degree at most \(D\). This statistic is order-independent, has node sensitivity at most \(D\), is computable as a degree-constrained subgraph problem, and satisfies a sharp bias sandwich in terms of the degree tail. Combined with the generalized exponential mechanism for scores of varying sensitivity, this yields a node-private adaptive algorithm with error
+\[
+  \widetilde O\!\left(\min_D \left\{\tail_D(G)+\frac{D}{\eps}\right\}\right).
+\]
+Our second contribution is geometric: for exact unit-distance graphs, point-circle incidence bounds imply
+\[
+R_k(P) \le O\!\left(\frac{n^2}{k^3}+\frac{n}{k}\right),
+\qquad
+\tail_D(P) \le O\!\left(\frac{n^2}{D^2}+n\right).
+\]
+The \(n/k\) term in the rich-points bound is a tight star contribution, and multi-star examples show that the additive \(n\) term in the tail bound cannot be dropped. Thus a fixed-\(D\) mechanism calibrated to a public size cap has unconditional error \(O(n^{2/3}\eps^{-2/3}+n)\), giving worst-case \(\Theta(n)\) error for \(n^{-1/2}\lesssim\eps\le O(1)\). We also define a formal circle-richness promise: if \(R_k(P)\le Cn^2/k^3\) above the operating threshold, the bias improves to \(O(Cn^2/D^2)\), yielding \(O(C^{1/3}n^{2/3}\eps^{-2/3})\) error. Critical star packings inside this promise give a matching lower bound in the same privacy range. The recent OpenAI/Sawin disproof of the Erd\H{o}s unit-distance conjecture provides extremal context: exact-distance graphs can have polynomially superlinear edge counts, but conditional on near-regularity, skewed degree tails rather than many-distance-pair instances are the bottleneck for adaptive private algorithms.
+\end{abstract}
+\end{titlepage}
+\pagenumbering{arabic}
+
+\section{Introduction}
+
+Node-private graph algorithms are forced to protect the contribution of a vertex together with all of its incident edges. Even for the simplest graph statistic, the number of edges, the worst-case node sensitivity is \(\Theta(n)\). Differential privacy and its basic sensitivity-calibrated mechanisms are now standard~\cite{DMNS06,DworkRoth14}, but for node-private graph statistics the main algorithmic difficulty is that global sensitivity is often too pessimistic: sparse, bounded-degree, or structured inputs should admit much more accurate answers.
+
+This paper studies that issue for geometric distance graphs. Given a planar point set \(P\), connect two points if their distance lies in a specified bin. The resulting edge count is an exact-distance statistic, an annulus statistic, a threshold statistic, or one coordinate of a pairwise-distance histogram. These are natural geometric aggregate queries, but from the node-private perspective they are graph edge-counting problems with highly input-dependent degree structure.
+
+The naive Laplace mechanism gives valid error \(O(n/\eps)\), but this can be unnecessarily pessimistic. Many datasets have low local distance degrees. Other datasets may have many equal-distance pairs in a near-regular way, so a degree-adaptive mechanism should pay roughly the typical degree rather than \(n\).
+
+The Erd\H{o}s unit-distance problem asks how many equal-distance pairs can be determined by \(n\) planar points~\cite{Erdos46,BrassMoserPach05}. The 2026 disproof of the Erd\H{o}s unit-distance conjecture sharpens the motivation but does not supply a privacy mechanism~\cite{OpenAI2026,Remarks2026}. It proves the existence of planar point sets with more than \(n^{1+\delta}\) unit-distance pairs, with Sawin giving an explicit exponent above \(1.014\) and later finite-certificate optimization improving the certificate to above \(1.0152\)~\cite{Sawin2026,Emmerich2026}. This changes the extremal geometry of exact-distance statistics. However, it does not make relative-error estimation harder on those extremal instances. If the signal is \(n^{1+\delta}\) and the naive noise is \(O(n/\eps)\), the relative error is \(O(n^{-\delta}/\eps)\), which is more favorable than on sparse \(\Theta(n)\) instances.
+
+The lesson is different: near-regular many-distance-pair instances separate naive global-sensitivity noise from adaptive degree-aware mechanisms, while skewed high-degree instances remain the true worst case.
+
+\paragraph{Contributions.}
+\begin{enumerate}[leftmargin=*]
+  \item We formalize three regimes: continuous exact distance, quantized exact distance, and separated annuli, making explicit that only the continuous exact-distance model has unbounded degree and that the separated-annulus guarantee is domain-restricted.
+  \item We define the canonical degree-bounded statistic \(f_D\), prove sensitivity \(D\), prove the bias sandwich \(U(G)-\tail_D(G)\le f_D(G)\le U(G)\), and note exact polynomial-time computation by \(b\)-matching.
+  \item We give an adaptive pure-DP release using the generalized exponential mechanism of Raskhodnikova and Smith, with error controlled by \(\min_D\{\tail_D+D/\eps\}\) up to logarithmic factors.
+  \item We record the standard rich-points incidence bound for exact unit distances, derive the sharpened degree-tail bound \(\tail_D\le O(n^2/D^2+n)\), and give a multi-star example showing why the additive \(n\) term is unavoidable.
+  \item We state a formal circle-richness promise under which the \(O(C^{1/3}n^{2/3}\eps^{-2/3})\) accuracy theorem is valid, while emphasizing that privacy holds on all inputs and the promise is only for accuracy.
+  \item We prove matching lower bounds: worst-case \(\Theta(n)\) error for \(n^{-1/2}\lesssim\eps\le O(1)\), and a promise-class lower bound matching the \(C^{1/3}n^{2/3}\eps^{-2/3}\) upper bound in its natural parameter range.
+\end{enumerate}
+
+
+\section{Main Results and Technical Overview}
+\label{sec:overview}
+
+This section summarizes the complete arc of the paper. The opening sections contain the formal model, the bounded-degree statistic, the incidence-geometric tail estimate, and the upper and lower bounds that make the main results tight. Later sections give standard extensions, related work, and supplementary discussion.
+
+\paragraph{Headline results.}
+Let \(N\) be the public size cap and let \(n=|P|\le N\) denote the input size in instance-specific bounds. The main guarantees are as follows.
+\begin{itemize}[leftmargin=*]
+  \item Unconditionally, for all exact-distance inputs and \(N^{-1/2}\le\eps\le1\), Corollary~\ref{cor:uncond-theta} gives worst-case expected error \(\Theta(N)\). The upper bound uses a public fixed threshold \(D\asymp(\eps N^2)^{1/3}\); the lower bound is one star insertion.
+  \item On circle-rich inputs, Theorem~\ref{thm:incidence-accuracy} and Proposition~\ref{prop:promise-lower} match at \(\Theta(C^{1/3}n^{2/3}\eps^{-2/3})\) in the natural privacy range. Corollary~\ref{cor:promise-oblivious} gives the corresponding promise-oblivious upper bound up to logarithms.
+  \item For arbitrary distance graphs, Theorem~\ref{thm:adaptive} gives an instance-adaptive oracle guarantee, within logarithms of the best tradeoff \(\min_D(\tail_D+D/\eps)\).
+\end{itemize}
+
+\paragraph{Why the logarithm disappears.}
+The standard rich-points estimate gives \(R_k(P)\le O(n^2/k^3+n/k)\). Summing this bound over all \(k>D\) loses a spurious logarithm. The sharper argument looks only once at the superlevel set \(S=\{p:\deg(p)>D\}\). If \(R=|S|\), then
+\[
+\tail_D(P)\le\sum_{p\in S}\deg(p)=I(P,\Gamma_S),
+\]
+where \(\Gamma_S\) is the family of unit circles centered at points of \(S\). Pach--Sharir gives \(I(P,\Gamma_S)\le O(n^{2/3}R^{2/3}+n+R)\), while the rich-points lemma at level \(D+1\) gives \(R\le O(n^2/D^3+n/D)\). Combining the two estimates yields the log-free bound
+\[
+\tail_D(P)\le O(n^2/D^2+n).
+\]
+This estimate is proved in full as Corollary~\ref{cor:tail}; Proposition~\ref{prop:multistar} shows the additive \(n\) term is unavoidable.
+
+\paragraph{The mechanism.}
+For a graph \(G\), the statistic
+\[
+ f_D(G)=\max\{|F|:F\subseteq E(G),\ \Delta((V,F))\le D\}
+\]
+is a canonical degree-bounded replacement for informal edge clipping. It has node sensitivity at most \(D\) and satisfies the bias sandwich \(U(G)-\tail_D(G)\le f_D(G)\le U(G)\). Thus fixed \(D\) gives error \(O(D/\eps+\tail_D)\), and the generalized exponential mechanism of Raskhodnikova--Smith privately selects \(D\) with candidate-specific sensitivity. The selection theorem is standard; the geometric content is the control of \(\tail_D\).
+
+\paragraph{Why the promise lower bound matches.}
+The circle-richness promise \(R_k\le Cn^2/k^3\) does not exclude all stars. It caps stars at the critical degree scale. The lower bound packs \(h\asymp1/\eps\) far-separated star gadgets, each with \(L\asymp(Cn^2/h)^{1/3}\) leaves, and inserts the centers one at a time. Every prefix of the path remains in the promise class because, for \(2\le k\le L\), the only \(k\)-rich vertices are the inserted centers and their number is at most \(h\le Cn^2/L^3\le Cn^2/k^3\). Each insertion raises the count by \(L\), so group privacy over the path gives error \(\Omega(hL)=\Omega(C^{1/3}n^{2/3}\eps^{-2/3})\). Proposition~\ref{prop:promise-lower} gives the full construction and parameter bookkeeping.
+
+\paragraph{Positioning.}
+The privacy machinery follows the bounded-degree projection and varying-sensitivity selection line of work, especially KNRS and RS16~\cite{KNRS13,RS16}. The novelty is the incidence-geometric bias analysis and the matching star-packing lower bound inside the geometric promise. The 2026 unit-distance breakthrough supplies extremal context: exact-distance graphs can have polynomially superlinear signal, but near-regular high-signal instances are not the bottleneck for the mechanisms here; skewed degree tails are.
+
+\section{Model and Problem Definition}
+
+\subsection{Databases and Node Differential Privacy}
+
+A database is a finite set of distinct planar points
+\[
+P=\{p_1,\ldots,p_n\}\subset \R^2,
+\]
+with \(n=|P|\le N\), where \(N\) is a public size upper bound. The actual value of \(n\) is used in the analysis; mechanisms that need a finite candidate grid use the public cap \(N\), not the private size. If the application treats \(n\) as public, one may set \(N=n\).
+
+The primary neighboring relation is add/remove node adjacency:
+\[
+P\sim P' \quad\Longleftrightarrow\quad P' \text{ is obtained from } P \text{ by adding or deleting one point.}
+\]
+This choice gives clean sensitivity statements. Replace-one adjacency changes at most two add/remove steps, so all sensitivity bounds below lose at most a factor of \(2\).
+
+\begin{definition}[Node differential privacy]
+A randomized mechanism \(M\) is \(\eps\)-node-DP if for all neighboring \(P\sim P'\) and all measurable output events \(S\),
+\[
+\Pr[M(P)\in S]\le e^\eps \Pr[M(P')\in S].
+\]
+\end{definition}
+
+All main statistics are raw counts, not normalized by \(n\). If normalized counts are desired, divide both the released answer and the error guarantees by the appropriate public scale. We do not allow duplicate coordinates in the main model. A multiset model can be defined by treating coincident records as distinct vertices, but then threshold and annulus statistics with very small bins have additional degeneracies; this variant is not considered here.
+
+\subsection{Distance Graphs and Statistics}
+
+For a distance bin \(b\), define the distance graph
+\[
+G_b(P)=(P,E_b(P)),\qquad
+E_b(P)=\bigl\{\{p_i,p_j\}:\|p_i-p_j\|\in b\bigr\}.
+\]
+Important special cases are
+\begin{align*}
+U_r(P)&=\#\{i<j:\|p_i-p_j\|=r\},\\
+A_{r,t}(P)&=\#\{i<j:\|p_i-p_j\|\in [r-t,r+t]\},\\
+B_r(P)&=\#\{i<j:\|p_i-p_j\|\le r\},\\
+H_b(P)&=\#\{i<j:\|p_i-p_j\|\in b\}.
+\end{align*}
+Each is the edge count of a graph \(G_b(P)\).
+
+\subsection{Primary Regime M1: Continuous Exact-Distance Model}
+
+The primary model is
+\[
+\text{M1: arbitrary finite }P\subset \R^2,\quad \text{exact distance }r,\quad \text{add/remove node-DP},\quad \text{raw count }U_r(P).
+\]
+This is the cleanest theoretical regime because degrees are unbounded. A star instance is realizable: put \(n-1\) points on the circle of radius \(r\), and add/delete the center. The statistic changes by \(n-1\).
+
+This is the regime where adaptivity is provably necessary. Any mechanism that is accurate on all inputs must confront the \(\Theta(n)\) star sensitivity, but many inputs have much smaller degree tails.
+
+
+\paragraph{Other distance regimes.}
+The main body focuses on M1, the continuous exact-distance model. Quantized exact distances and separated annuli have finite degree bounds by elementary number-theoretic and packing arguments; these bonus regimes, histogram composition, and the promise-restricted nature of the separated-annulus guarantee are recorded in Section~\ref{sec:additional-regimes}.
+
+\section{Degree-Bounded Edge Count}
+
+Let \(G=(V,E)\) be any graph. For an integer \(D\ge 0\), define
+\[
+f_D(G)=\max\bigl\{|F|:F\subseteq E,\ \Delta((V,F))\le D\bigr\}.
+\]
+That is, \(f_D(G)\) is the largest number of edges in a subgraph of \(G\) with maximum degree at most \(D\). This is a canonical replacement for informal edge clipping. It is order-independent and can be computed as a degree-constrained subgraph problem, equivalently a simple \(b\)-matching instance with uniform vertex capacities \(D\)~\cite{Schrijver03,Gabow18}.
+
+\begin{proposition}[Node sensitivity of \(f_D\)]
+\label{prop:sensitivity}
+Under add/remove node adjacency,
+\[
+|f_D(G)-f_D(G-v)|\le D.
+\]
+Therefore, for a distance graph \(G_b(P)\), the statistic \(P\mapsto f_D(G_b(P))\) has node sensitivity at most \(D\).
+\end{proposition}
+
+\begin{proof}
+Let \(F\) be an optimal degree-\(D\) subgraph of \(G\). Since \(F\) has maximum degree at most \(D\), the vertex \(v\) is incident to at most \(D\) edges of \(F\). Removing \(v\) and its incident edges leaves a feasible degree-\(D\) subgraph of \(G-v\) with at least \(f_D(G)-D\) edges. Thus \(f_D(G-v)\ge f_D(G)-D\). Conversely, any feasible degree-\(D\) subgraph of \(G-v\) is also feasible in \(G\), so \(f_D(G)\ge f_D(G-v)\). For replace-one adjacency, apply the add/remove bound twice.
+\end{proof}
+
+\begin{proposition}[Bias sandwich]
+\label{prop:bias-sandwich}
+Let
+\[
+U(G)=|E|,\qquad
+\tail_D(G)=\sum_{v\in V}(\deg_G(v)-D)_+.
+\]
+Then
+\[
+U(G)-\tail_D(G)\le f_D(G)\le U(G).
+\]
+\end{proposition}
+
+\begin{proof}
+The upper bound is immediate since \(f_D(G)\) counts a subset of edges. For the lower bound, start with \(G\) and repeatedly delete an edge incident to any vertex whose current degree exceeds \(D\). Each deleted edge reduces \(\sum_v(\deg(v)-D)_+\) by at least \(1\). The initial value is \(\tail_D(G)\), so after at most \(\tail_D(G)\) edge deletions all degrees are at most \(D\). The remaining subgraph has at least \(U(G)-\tail_D(G)\) edges and is feasible for \(f_D(G)\).
+\end{proof}
+
+\paragraph{Fixed-\(D\) mechanism.}
+For fixed \(D\), release
+\[
+M_D(P)=f_D(G_b(P))+\Lap(D/\eps).
+\]
+By Proposition~\ref{prop:sensitivity}, this is \(\eps\)-node-DP under add/remove adjacency. Its error relative to the true edge count \(U_b(P)=|E_b(P)|\) is
+\[
+|M_D(P)-U_b(P)|\lesssim O(D/\eps)+\tail_D(G_b(P)).
+\]
+This gives the oracle target \(\min_D\{D/\eps+\tail_D(G_b(P))\}\).
+
+\paragraph{Private selection of \(D\).}
+Let the candidate set be a doubling grid
+\[
+\calD=\{1,2,4,\ldots,2^{\lceil\log_2 N\rceil}\}.
+\]
+The selector is the generalized exponential mechanism of Raskhodnikova--Smith~\cite[Theorem~1.4]{RS16}, applied to candidate-specific sensitivity \(D\).
+
+For each \(D\), \(f_D(G_b(P))\le U_b(P)\). Fix a failure probability \(\beta\) and let \(a=\log(2/\beta)\). The high-probability oracle error proxy is
+\[
+\operatorname{err}(D;P)=U_b(P)-f_D(G_b(P))+\frac{aD}{\eps_{\mathrm{rel}}},
+\]
+where \(\eps_{\mathrm{rel}}\) is the budget reserved for the final noisy release. Since \(U_b(P)\) is common to all \(D\), minimizing \(\operatorname{err}(D;P)\) is equivalent to minimizing
+\[
+q_D(P)=-f_D(G_b(P))+\frac{aD}{\eps_{\mathrm{rel}}}.
+\]
+The score \(q_D\) has sensitivity at most \(D\), because \(f_D\) has sensitivity at most \(D\) and the second term is public.
+
+\section{Incidence Geometry for Exact Unit Distances}
+
+This section is specific to exact-distance graphs. It does not apply to fat annuli without additional separation or density assumptions. By scaling, take the target distance to be \(1\).
+
+For a point set \(P\) with \(|P|=n\), define
+\[
+\deg(p)=\#\{q\in P:\|p-q\|=1\},\qquad
+R_k(P)=\#\{p\in P:\deg(p)\ge k\}.
+\]
+
+\begin{lemma}[Rich-points bound]
+\label{lem:rich}
+For every \(k\ge 1\),
+\[
+R_k(P)\le O\!\left(\frac{n^2}{k^3}+\frac{n}{k}\right).
+\]
+\end{lemma}
+
+\begin{proof}
+Let \(Q\subset P\) be the set of \(k\)-rich points, so \(|Q|=R_k(P)=m\). For each \(q\in Q\), consider the unit circle centered at \(q\). Let \(\Gamma\) be this family of \(m\) congruent circles. Each \(q\in Q\) has at least \(k\) points of \(P\) on its unit circle, so the number of point-circle incidences between \(P\) and \(\Gamma\) satisfies
+\[
+I(P,\Gamma)\ge km.
+\]
+Congruent circles form a pseudo-circle family: any two distinct unit circles intersect in at most two points. The Szemerédi--Trotter-type incidence bound for points and pseudo-circles~\cite{PachSharir98} gives
+\[
+I(P,\Gamma)\le C(n^{2/3}m^{2/3}+n+m)
+\]
+for an absolute constant \(C\). Hence
+\[
+km\le C(n^{2/3}m^{2/3}+n+m).
+\]
+For small constant \(k\), the result is trivial after adjusting constants. For larger \(k\), absorb the \(Cm\) term into the left side. Then either \(km\le O(n^{2/3}m^{2/3})\), which implies \(m\le O(n^2/k^3)\), or \(km\le O(n)\), which implies \(m\le O(n/k)\). Combining yields the stated bound.
+\end{proof}
+
+\begin{corollary}[Degree-tail bound]
+\label{cor:tail}
+For the exact unit-distance graph and every \(D\ge 1\),
+\[
+\tail_D(P)=\sum_{p\in P}(\deg(p)-D)_+
+\]
+satisfies
+\[
+\tail_D(P)\le O\!\left(\frac{n^2}{D^2}+n\right).
+\]
+\end{corollary}
+
+\begin{proof}
+Let \(S=\{p\in P:\deg(p)>D\}\), and write \(R=|S|=R_{D+1}(P)\). Let \(\Gamma_S\) be the family of unit circles centered at points of \(S\). Then
+\[
+\tail_D(P)\le \sum_{p\in S}\deg(p)=I(P,\Gamma_S).
+\]
+The same point-circle incidence bound used in Lemma~\ref{lem:rich} gives
+\[
+I(P,\Gamma_S)\le O(n^{2/3}R^{2/3}+n+R).
+\]
+By Lemma~\ref{lem:rich},
+\[
+R\le O\!\left(\frac{n^2}{D^3}+\frac{n}{D}\right).
+\]
+Therefore, using \((a+b)^{2/3}\le a^{2/3}+b^{2/3}\),
+\[
+n^{2/3}R^{2/3}
+\le O\!\left(\frac{n^2}{D^2}+n^{4/3}D^{-2/3}\right)
+\le O\!\left(\frac{n^2}{D^2}+n\right),
+\]
+where the last step uses \(n^{4/3}D^{-2/3}=(n^2/D^2)^{1/3}n^{2/3}\le O(n^2/D^2+n)\). The remaining \(+n+R\) terms are also \(O(n^2/D^2+n)\) for \(D\ge1\).
+\end{proof}
+
+\begin{proposition}[Multi-star tightness of the additive \(n\) term]
+\label{prop:multistar}
+Fix \(D\ge 1\) with \(2D+1\le n\). There is an exact unit-distance point set \(P\) with \(|P|\le n\) for which
+\[
+\tail_D(P)=\Omega(n).
+\]
+In particular, an additive contribution of order \(n\) cannot be removed from an unconditional tail bound.
+\end{proposition}
+
+\begin{proof}
+Take \(s=\lfloor n/(2D+1)\rfloor\) vertex-disjoint unit stars. Each star consists of a center and \(2D\) points on the unit circle around it. Choose the leaf angles generically so that no two leaves in the same star are at unit distance, and place different stars far enough apart to create no cross-star unit distances. Each center has degree \(2D\), each leaf has degree \(1\), and hence each star contributes \(D\) to \(\tail_D\). If \(D>n/6\), then \(s\ge 1\) and \(sD=\Omega(n)\). If \(D\le n/6\), then \(s=\Omega(n/D)\), so again \(sD=\Omega(n)\).
+\end{proof}
+
+\begin{remark}
+For Lemma~\ref{lem:rich} itself, the \(n/k\) term is witnessed at a single scale by \(\lfloor n/(k+1)\rfloor\) disjoint stars of degree \(k\), giving \(R_k=\Theta(n/k)\). Proposition~\ref{prop:multistar} is the corresponding tail witness at a chosen threshold \(D\), and shows that the additive \(n\) term in Corollary~\ref{cor:tail} is unavoidable.
+\end{remark}
+
+\begin{definition}[Circle-richness promise]
+\label{def:circle-rich}
+For parameters \(C\ge 1\) and \(D_0\ge 1\), a point set \(P\) is \((C,D_0)\)-circle-richness-regular if, for every integer \(k>D_0\),
+\[
+R_k(P)\le C\,\frac{n^2}{k^3}.
+\]
+The parameters \(C\) and \(D_0\) are used only in the accuracy analysis; the private mechanism below does not take them as input. The condition is meaningful for \(D_0<k\le n\), since \(R_k=0\) for \(k>n\).
+\end{definition}
+
+\begin{corollary}[Tail bound under circle-richness regularity]
+\label{cor:promise-tail}
+If \(P\) is \((C,D_0)\)-circle-richness-regular and \(D\ge D_0\), then
+\[
+\tail_D(P)\le O\!\left(\frac{C n^2}{D^2}\right).
+\]
+\end{corollary}
+
+\begin{proof}
+Use \(\tail_D(P)=\sum_{k>D}R_k(P)\) and Definition~\ref{def:circle-rich}:
+\[
+\sum_{k>D}R_k(P)\le Cn^2\sum_{k>D}k^{-3}=O(Cn^2/D^2).
+\]
+\end{proof}
+
+\begin{remark}
+The promise in Definition~\ref{def:circle-rich} is an accuracy promise, not a privacy assumption. It does not exclude all stars; it excludes only stars whose degree is supercritical relative to \(C^{1/3}n^{2/3}\). Critical-scale stars and star packings satisfy the promise and will be used for the matching lower bound in Proposition~\ref{prop:promise-lower}. Bounded-degree families satisfy the promise vacuously once \(D_0\) exceeds the maximum degree, but then the tail is already zero above \(D_0\). Continuous random perturbations also satisfy it almost surely for exact distances, because they typically destroy all exact unit distances; this is not a meaningful high-signal example. Identifying natural deterministic, quantized, or smoothed high-signal models that imply the promise without being star-like remains an open modeling problem.
+\end{remark}
+
+\begin{remark}[Connection to extremal unit distances]
+\label{rem:sst-tight}
+The matching lower bound below is witnessed at a single critical scale by star packings; it does not require tightness of the full Spencer--Szemerédi--Trotter unit-distance upper bound. A different and stronger requirement would be tightness of \(R_k\lesssim n^2/k^3\) across many scales or near \(k\asymp n^{1/3}\), which would force \(\Omega(n^{4/3})\) unit-distance edges. That remains tied to the classical extremal problem~\cite{SpencerSzemerediTrotter84}; current constructions, even after the 2026 breakthrough, are far below that exponent.
+\end{remark}
+
+\section{Accuracy Theorems}
+
+\begin{theorem}[Fixed-\(D\) accuracy]
+\label{thm:fixedD}
+For fixed \(D\), the mechanism
+\[
+M_D(P)=f_D(G_1(P))+\Lap(D/\eps)
+\]
+is \(\eps\)-node-DP under add/remove adjacency and, with constant probability,
+\[
+|M_D(P)-U_1(P)|\le O(D/\eps+\tail_D(P)).
+\]
+For probability at least \(1-\beta\), replace \(D/\eps\) by \((D/\eps)\log(1/\beta)\).
+\end{theorem}
+
+\begin{proof}
+Privacy follows from Proposition~\ref{prop:sensitivity} and the Laplace mechanism. Accuracy follows from Proposition~\ref{prop:bias-sandwich} and the standard Laplace tail bound.
+\end{proof}
+
+\begin{theorem}[Incidence-controlled accuracy]
+\label{thm:incidence-accuracy}
+For exact unit-distance release in M1, fixed-\(D\) release satisfies
+\[
+|M_D(P)-U_1(P)|\le O\!\left(\frac{D}{\eps}+\frac{n^2}{D^2}+n\right)
+\]
+with constant probability. The additive \(n\) term is unavoidable in a worst-case theorem by Proposition~\ref{prop:multistar}.
+
+If \(P\) is \((C,D_0)\)-circle-richness-regular and \(D\ge D_0\), then the error becomes
+\[
+O\!\left(\frac{D}{\eps}+\frac{C n^2}{D^2}\right).
+\]
+If \(D_0\le (C\eps n^2)^{1/3}\), choosing \(D\asymp (C\eps n^2)^{1/3}\) gives
+\[
+O(C^{1/3}n^{2/3}\eps^{-2/3})
+\]
+error with constant probability.
+\end{theorem}
+
+\begin{proof}
+Combine Theorem~\ref{thm:fixedD} with Corollary~\ref{cor:tail} for the unconditional statement. Under the promise, use Corollary~\ref{cor:promise-tail}. Optimizing \(D/\eps+Cn^2/D^2\) gives \(D\asymp(C\eps n^2)^{1/3}\), provided this choice is at least \(D_0\).
+\end{proof}
+
+\begin{corollary}[Unconditional worst-case characterization]
+\label{cor:uncond-theta}
+Let \(N\) be the public size cap. For \(N^{-1/2}\le \eps\le 1\), the worst-case expected error of pure node-DP exact unit-distance counting on databases of size at most \(N\) is \(\Theta(N)\).
+\end{corollary}
+
+\begin{proof}
+For the upper bound, take the public threshold \(D=\lceil(\eps N^2)^{1/3}\rceil\) in the fixed-\(D\) mechanism. For any input \(P\) with \(m=|P|\le N\), Corollary~\ref{cor:tail} gives
+\[
+\tail_D(P)\le O(m^2/D^2+m)\le O(N^2/D^2+N).
+\]
+Since the expected absolute value of \(\Lap(D/\eps)\) is \(D/\eps\), Theorem~\ref{thm:fixedD} gives expected error
+\[
+O(D/\eps+N^2/D^2+N)=O(N^{2/3}\eps^{-2/3}+N)=O(N)
+\]
+throughout the stated range. The lower bound is Proposition~\ref{prop:lower} with \(n=N\), since \(1/(1+e^\eps)=\Omega(1)\) for \(\eps\le1\).
+\end{proof}
+
+\begin{remark}[Promise parameter regimes]
+For constant \(\eps\), if \(C=n^\gamma\) and \(D_0=n^\eta\), the displayed choice is feasible when \(\eta\le (2+\gamma)/3\), and the resulting error scale is \(C^{1/3}n^{2/3}=n^{(2+\gamma)/3}\) up to constants. Thus constant \(C\) and \(D_0\le n^{2/3}\) give the advertised \(O(n^{2/3})\) scale. The bound remains sublinear for \(C=n^{\gamma}\) with \(\gamma<1\), but deteriorates as the promise constant grows.
+\end{remark}
+
+\section{Lower Bounds and Limitations}
+\label{sec:lower}
+
+\paragraph{Star lower-bound instance.}
+Let \(P\) consist of one center point and \(m=n-1\) points on the unit circle around it. Deleting the center changes \(U_1(P)\) by \(m\). Therefore the local sensitivity at this instance is \(\Theta(n)\).
+
+\begin{proposition}[Constant-privacy \(\Omega(n)\) lower bound]
+\label{prop:lower}
+For add/remove node-DP on databases of size at most \(n\), any \(\eps\)-node-DP mechanism estimating \(U_1\) has worst-case expected absolute error at least
+\[
+\Omega\!\left(\frac{n}{1+e^\eps}\right).
+\]
+In particular, for constant \(\eps\), the worst-case expected error is \(\Omega(n)\).
+\end{proposition}
+
+\begin{proof}
+Let \(P_0\) consist of \(m=n-1\) points on the unit circle centered at the origin, and let \(P_1=P_0\cup\{0\}\). Then \(P_0\) and \(P_1\) are add/remove neighbors, and
+\[
+U_1(P_1)=U_1(P_0)+m,
+\]
+because the added center creates exactly \(m\) new unit-distance pairs. Let \(L=U_1(P_0)\), and define
+\[
+T=[L+2m/3,L+4m/3].
+\]
+If a mechanism has error less than \(m/3\) on \(P_1\), its output lies in \(T\). If it has error less than \(m/3\) on \(P_0\), its output lies outside \(T\). Write
+\[
+p_1=\Pr[M(P_1)\in T],\qquad p_0=\Pr[M(P_0)\in T].
+\]
+Differential privacy gives \(p_1\le e^\eps p_0\). If the probability of error at least \(m/3\) were less than \(\rho\) on both \(P_0\) and \(P_1\), then \(p_1>1-\rho\) and \(p_0<\rho\), implying \(1-\rho<e^\eps\rho\). Thus for at least one of \(P_0,P_1\), the probability of error at least \(m/3\) is at least \(1/(1+e^\eps)\). The expected-error bound follows.
+
+For fixed-size databases under replace-one adjacency, add a dummy point far away from all other points and replace it by the center; constants change by at most a factor of two.
+\end{proof}
+
+\begin{remark}
+Proposition~\ref{prop:lower} supplies the lower side of Corollary~\ref{cor:uncond-theta} for \(\eps\le1\); as \(\eps\) grows, its displayed bound correctly decays to zero. The next proposition shows that, at the critical star scale, the circle-richness promise itself contains matching hard instances.
+\end{remark}
+
+\begin{proposition}[Promise-class lower bound]
+\label{prop:promise-lower}
+There are absolute constants \(a,b>0\) such that the following holds. Let \(1\le C\le n\), \(D_0\ge1\), and
+\[
+a\,C^{1/2}n^{-1/2}\le \eps\le 1.
+\]
+For every \(\eps\)-node-DP mechanism \(M\) estimating \(U_1\) on point sets of size at most \(n\),
+\[
+\sup_{P\ \text{\((C,D_0)\)-circle-richness-regular}}
+\mathbb{E}|M(P)-U_1(P)|
+\ge b\,C^{1/3}n^{2/3}\eps^{-2/3}.
+\]
+\end{proposition}
+
+\begin{proof}
+Let \(h=\max\{1,\lfloor 1/(4\eps)\rfloor\}\). Choose a sufficiently small absolute constant \(\alpha>0\), and set
+\[
+L=\left\lfloor \alpha\left(\frac{C n^2}{h}\right)^{1/3}\right\rfloor.
+\]
+Under the stated lower bound on \(\eps\), and after adjusting constants, \(L\ge1\) and \(h(L+1)\le n/2\).
+
+Construct \(h\) far-separated unit-star gadgets. Gadget \(i\) has a potential center \(c_i\) and \(L\) leaves on the unit circle centered at \(c_i\). Choose the leaf angles generically so that no two leaves in the same gadget are at unit distance, and place the gadgets and all padding points far enough apart so that there are no cross-gadget or padding unit distances. Add \(n-h(L+1)\) isolated padding points, and let \(P_i\) contain all leaves, the first \(i\) centers \(c_1,\ldots,c_i\), and all padding points, for \(0\le i\le h\). Then \(|P_h|=n\), \(|P_i|\ge n-h\ge n/2\), \(P_i\) and \(P_{i+1}\) are add/remove neighbors, and
+\[
+U_1(P_i)=U_1(P_0)+iL.
+\]
+
+Each \(P_i\) satisfies the \((C,D_0)\)-circle-richness promise. Indeed, since \(D_0\ge1\), only thresholds \(k\ge2\) matter. For \(2\le k\le L\), the only vertices of degree at least \(k\) are the inserted centers, so \(R_k(P_i)=i\le h\); for \(k>L\), \(R_k(P_i)=0\). Since \(|P_i|\ge n/2\) and \(L^3\le \alpha^3 Cn^2/h\), taking \(\alpha\) small enough gives
+\[
+h\le C\,\frac{|P_i|^2}{L^3}\le C\,\frac{|P_i|^2}{k^3}
+\]
+for every \(2\le k\le L\).
+
+Let \(G=hL=U_1(P_h)-U_1(P_0)\), and set
+\[
+T=[U_1(P_0)+2G/3,\ U_1(P_0)+4G/3].
+\]
+Pure DP and group privacy over the \(h\)-step path give
+\[
+\Pr[M(P_h)\in T]\le e^{h\eps}\Pr[M(P_0)\in T].
+\]
+Since \(h\eps\le1\), the same two-point argument as in Proposition~\ref{prop:lower} implies that for at least one of \(P_0,P_h\), the probability of error at least \(G/3\) is bounded below by an absolute constant. Hence the expected error is \(\Omega(G)\). Finally,
+\[
+G=hL=\Omega\!\left(C^{1/3}n^{2/3}h^{2/3}\right)
+=\Omega\!\left(C^{1/3}n^{2/3}\eps^{-2/3}\right),
+\]
+where for \(\eps=\Theta(1)\) we use \(h=1\), which is the same bound up to constants.
+\end{proof}
+
+\subsection{Local Inverse-Sensitivity Landscape}
+
+For a point set \(P\), define its external unit-circle occupancy
+\[
+\rho_{\mathrm{ext}}(P)=\max_{c\in\R^2\setminus P}\#\{p\in P:\|p-c\|=1\}.
+\]
+This quantity controls how many new edges a single inserted point can create, even if the inserted center is not already in \(P\).
+
+\begin{proposition}[One-step landscape for exact unit distances]
+\label{prop:local-landscape}
+For the exact unit-distance count \(U_1\), the add/remove local sensitivity at \(P\) is exactly
+\[
+\max\{\Delta(G_1(P)),\rho_{\mathrm{ext}}(P)\}.
+\]
+Moreover, both terms are necessary: deleting a high-degree vertex changes \(U_1\) by its degree, while adding an external center of a circle attaining \(\rho_{\mathrm{ext}}(P)\) changes \(U_1\) by \(\rho_{\mathrm{ext}}(P)\).
+\end{proposition}
+
+\begin{proof}
+Deleting \(p\in P\) removes exactly \(\deg_{G_1(P)}(p)\) unit-distance pairs, and some vertex attains \(\Delta(G_1(P))\). Adding a new point \(c\notin P\) creates exactly the number of existing points on the unit circle centered at \(c\), whose maximum is \(\rho_{\mathrm{ext}}(P)\). A star with its center present makes the deletion term necessary, while the corresponding leaf-only instance makes the insertion term necessary.
+\end{proof}
+
+This explains the star lower-bound pair from the viewpoint of inverse-sensitivity mechanisms. For the leaf-only instance \(P_0\), the graph degree is small but \(\rho_{\mathrm{ext}}(P_0)=\Theta(n)\), because the missing center can be inserted in one edit. For a genuinely near-regular instance to be easy for a generic inverse-sensitivity mechanism, it is not enough that existing vertices have degree \(O(\Delta)\); one also needs external circle occupancy \(\rho_{\mathrm{ext}}(P)=O(\Delta)\). The \(f_D\)-based mechanism avoids using the raw local sensitivity of \(U_1\), but differential privacy still couples such instances to neighboring high-count stars, as Proposition~\ref{prop:lower} shows.
+
+\subsection{Beyond the Characterized Range}
+The promise-class lower bound uses a path of critical star insertions, with each step increasing the count by \(L\asymp(C\eps n^2)^{1/3}\). This matches the incidence-controlled upper bound in the range \(C^{1/2}n^{-1/2}\lesssim\eps\le1\). For much smaller \(\eps\), the point budget prevents the same packing from fitting inside \(n\) records.
+
+A sharper global description at very small privacy parameters would likely involve the maximum number of incidences between \(n\) data points and \(k\) admissible unit-circle centers. This top-\(k\) rich-circle quantity is a natural bridge between node-private lower bounds and extremal unit-distance geometry, but we leave that refinement for future work.
+
+
+\section{Adaptive Threshold Selection}
+\label{sec:adaptive-selection}
+
+\begin{theorem}[Adaptive accuracy via varying-sensitivity selection]
+\label{thm:adaptive}
+Let
+\[
+\calD=\{1,2,4,\ldots,2^{\lceil\log_2 N\rceil}\},\qquad K=|\calD|.
+\]
+Split \(\eps=\eps_{\mathrm{sel}}+\eps_{\mathrm{rel}}\) and fix failure probability \(\beta\). Set \(a=\log(2/\beta)\). Run the generalized exponential mechanism on scores
+\[
+q_D(P)=-f_D(G_1(P))+\frac{aD}{\eps_{\mathrm{rel}}}
+\]
+with sensitivity bound \(D\), obtaining \(\widehat D\). Then release
+\[
+f_{\widehat D}(G_1(P))+\Lap(\widehat D/\eps_{\mathrm{rel}}).
+\]
+This mechanism is \(\eps\)-node-DP. With probability at least \(1-\beta\), its error satisfies
+\[
+\operatorname{err}(P)\le
+\min_{D\in \calD}
+\left\{
+\tail_D(P)+\frac{D\log(2/\beta)}{\eps_{\mathrm{rel}}}
++\frac{4D\log(2K/\beta)}{\eps_{\mathrm{sel}}}
+\right\}.
+\]
+In particular, for a constant privacy split,
+\[
+\operatorname{err}(P)\le
+O\!\left(\min_{D\in\calD}\left\{\tail_D(P)+\frac{D\log(K/\beta)}{\eps}\right\}\right).
+\]
+The restriction to the doubling grid loses at most a constant factor in the \(D/\eps\) term compared with minimizing over all integer \(1\le D\le N\).
+\end{theorem}
+
+\begin{proof}
+For each \(D\), the score \(q_D\) has node sensitivity at most \(D\). The generalized exponential mechanism run with privacy budget \(\eps_{\mathrm{sel}}\) is \(\eps_{\mathrm{sel}}\)-node-DP. Conditional on the selected \(\widehat D\), the statistic \(f_{\widehat D}\) has node sensitivity at most \(\widehat D\), so the Laplace release with scale \(\widehat D/\eps_{\mathrm{rel}}\) is \(\eps_{\mathrm{rel}}\)-node-DP. Adaptive composition gives \(\eps\)-node-DP.
+
+By the RS16 utility guarantee for varying-sensitivity scores~\cite[Theorem~1.4]{RS16}, with probability at least \(1-\beta/2\),
+\[
+q_{\widehat D}(P)\le
+\min_{D\in\calD}
+\left\{q_D(P)+\frac{4D\log(2K/\beta)}{\eps_{\mathrm{sel}}}\right\}.
+\]
+With probability at least \(1-\beta/2\), the Laplace noise \(Z\) in the final release satisfies
+\[
+|Z|\le \frac{\widehat D\log(2/\beta)}{\eps_{\mathrm{rel}}}=\frac{a\widehat D}{\eps_{\mathrm{rel}}}.
+\]
+On the intersection of these events,
+\begin{align*}
+|f_{\widehat D}(G_1(P))+Z-U_1(P)|
+&\le U_1(P)-f_{\widehat D}(G_1(P))+|Z|\\
+&\le U_1(P)-f_{\widehat D}(G_1(P))+\frac{a\widehat D}{\eps_{\mathrm{rel}}}\\
+&=U_1(P)+q_{\widehat D}(P).
+\end{align*}
+Applying the selection guarantee and using \(U_1(P)-f_D(G_1(P))\le \tail_D(P)\) proves the displayed bound. A union bound gives probability at least \(1-\beta\).
+
+For the grid comparison, take any integer \(D\le N\) and let \(D'\in\calD\) satisfy \(D\le D'\le 2D\). Since \(\tail_{D'}(P)\le \tail_D(P)\), the objective at \(D'\) is at most the objective at \(D\) up to a factor \(2\) on the linear sensitivity term.
+\end{proof}
+
+\begin{corollary}[Promise-oblivious adaptive accuracy]
+\label{cor:promise-oblivious}
+The adaptive mechanism of Theorem~\ref{thm:adaptive} does not take \(C\) or \(D_0\) as input. Let
+\[
+D_\star=\left(\frac{C n^2\eps}{\log(K/\beta)}\right)^{1/3}.
+\]
+Nevertheless, if \(P\) is \((C,D_0)\)-circle-richness-regular and
+\[
+D_0\le D_\star\le N,
+\]
+then, for a constant privacy split, with probability at least \(1-\beta\),
+\[
+\operatorname{err}(P)\le
+O\!\left(C^{1/3}n^{2/3}\left(\frac{\log(K/\beta)}{\eps}\right)^{2/3}\right).
+\]
+\end{corollary}
+
+\begin{proof}
+Combine Theorem~\ref{thm:adaptive} with Corollary~\ref{cor:promise-tail}. Under the promise, the adaptive objective is bounded by
+\[
+O\!\left(\frac{Cn^2}{D^2}+\frac{D\log(K/\beta)}{\eps}\right)
+\]
+for every grid value \(D\ge D_0\). Optimize the right-hand side over \(D\) and use the doubling-grid loss from Theorem~\ref{thm:adaptive}.
+\end{proof}
+
+
+\section{Additional Regimes}
+\label{sec:additional-regimes}
+
+\subsection{Bonus Regime M2: Quantized Exact-Distance Model}
+
+Suppose \(P\subset (1/q)\Z^2\) and the target distance is \(r\), with \(qr\) an integer. For any point \(p\), the number of grid points at exact distance \(r\) from \(p\) is at most the number of integer representations
+\[
+a^2+b^2=(qr)^2.
+\]
+Thus the exact-distance degree is bounded by \(r_2((qr)^2)\), where \(r_2(N)\) is the number of representations of \(N\) as a sum of two squares. Jacobi's two-square formula and the standard divisor bound give~\cite{HardyWright08}
+\[
+r_2((qr)^2)\le (qr)^{O(1/\log\log(qr))}.
+\]
+If \(q,r=\poly(n)\), then the global sensitivity is \(n^{o(1)}\). The star obstruction from M1 is no longer realizable at degree \(\Theta(n)\) unless the grid scale or target radius is enormous.
+
+Consequently, plain Laplace noise with scale \(n^{o(1)}/\eps\) essentially resolves quantized exact-distance release up to \(n^{o(1)}\) factors. There is also a matching sensitivity example at the lattice-circle degree scale: include a center and all grid points on a radius-\(r\) lattice circle. Add/delete the center changes the count by \(r_2((qr)^2)\).
+
+\begin{proposition}[Quantized exact-distance release]
+\label{prop:m2}
+In M2, let
+\[
+\Delta_{q,r}=r_2((qr)^2).
+\]
+The exact-distance count \(U_r\) on grid point sets has add/remove node sensitivity at most \(\Delta_{q,r}\). Hence the Laplace mechanism
+\[
+U_r(P)+\Lap(\Delta_{q,r}/\eps)
+\]
+is \(\eps\)-node-DP and has error \(O((\Delta_{q,r}/\eps)\log(1/\beta))\) with probability at least \(1-\beta\). This sensitivity bound is tight: the center-plus-lattice-circle construction changes the count by exactly \(\Delta_{q,r}\).
+\end{proposition}
+
+\begin{proof}
+Adding or deleting one grid point changes the count by the number of existing grid points at distance \(r\) from it, which is at most the number of integer solutions to \(a^2+b^2=(qr)^2\). The privacy and accuracy statements are the standard Laplace mechanism. The lower example is the center-plus-lattice-circle construction described above.
+\end{proof}
+
+If arbitrary locations are first mapped to occupied cells of a fixed public grid, this deterministic preprocessing maps add/remove neighbors to grid databases that are equal or add/remove neighbors. Running the mechanism above on the rounded set therefore gives ordinary node-DP for the rounded statistic; this is not a promise-restricted privacy claim.
+
+\subsection{Bonus Regime M3: Separated Annulus Model}
+
+For annulus statistics \(A_{r,t}(P)\), no nontrivial bound exists without geometric restrictions. Two clusters of diameter \(<t\), placed at distance \(r\), create \(\Theta(n^2)\) annulus pairs.
+
+Assume instead a minimum separation condition:
+\[
+\|p_i-p_j\|\ge \Delta_{\min}\qquad\text{for all }i\ne j.
+\]
+Then the degree of any point in the annulus is bounded by a packing estimate:
+\[
+\Delta_{\text{annulus}}\le O\!\left(\frac{rt}{\Delta_{\min}^2}+\frac{r}{\Delta_{\min}}+1\right).
+\]
+The reason is that the annulus has area \(\Theta(rt)\) and boundary length \(\Theta(r)\), and a \(\Delta_{\min}\)-separated set has at most \(O(\mathrm{area}/\Delta_{\min}^2+\mathrm{perimeter}/\Delta_{\min}+1)\) points in such a region.
+
+\begin{proposition}[Separated annulus release]
+\label{prop:m3}
+In M3, suppose the input domain is restricted to \(\Delta_{\min}\)-separated point sets, and privacy is required only for neighboring datasets that both satisfy this separation condition. Let
+\[
+\Delta_{r,t,\Delta_{\min}}=
+O\!\left(\frac{rt}{\Delta_{\min}^2}+\frac{r}{\Delta_{\min}}+1\right).
+\]
+Then \(A_{r,t}\) has node sensitivity at most \(\Delta_{r,t,\Delta_{\min}}\). The mechanism
+\[
+A_{r,t}(P)+\Lap(\Delta_{r,t,\Delta_{\min}}/\eps)
+\]
+is \(\eps\)-node-DP on this restricted domain and has zero clipping bias, with error
+\[
+O\!\left(\frac{\Delta_{r,t,\Delta_{\min}}}{\eps}\log(1/\beta)\right)
+\]
+with probability at least \(1-\beta\).
+\end{proposition}
+
+\begin{proof}
+The packing bound above controls the number of annulus neighbors of any inserted or deleted point whenever both endpoints of the neighboring pair remain in the separated input class. The result follows from the Laplace mechanism on the restricted domain.
+\end{proof}
+
+This M3 guarantee is intentionally promise-restricted. Unlike M2, an arbitrary insertion into a separated set can violate the separation promise, so the displayed packing bound is not a global sensitivity bound over all point sets. Recovering all-input privacy would require a restricted-sensitivity or Lipschitz-extension transformation in the style of Blocki--Blum--Datta--Sheffet or Raskhodnikova--Smith~\cite{BBDS13,RS16}; we do not claim that transformation here.
+
+The same argument gives a threshold-count bound under separation: for \(B_r(P)=\#\{i<j:\|p_i-p_j\|\le r\}\), the relevant neighborhood is a disk of radius \(r\), so the sensitivity is \(O(r^2/\Delta_{\min}^2+1)\).
+
+\paragraph{Histograms and multiple bins.}
+For a distance histogram with bins \(b_1,\ldots,b_L\), node adjacency affects all bins incident to the changed point. Thus privacy composition across bins is sequential rather than parallel. A simple pure-DP implementation allocates budgets \(\eps_1+\cdots+\eps_L\le \eps\) and runs the one-bin mechanism in each bin. Equivalently, one may add independent Laplace noise calibrated to an \(\ell_1\)-sensitivity bound for the whole vector. In either case, the per-bin budget degrades with the number of released bins unless additional structure is used.
+
+
+
+\section{Related Work}
+\label{sec:related-work-full}
+
+
+\paragraph{Differential privacy and private selection.}
+The Laplace mechanism follows the sensitivity-calibration paradigm of Dwork, McSherry, Nissim, and Smith~\cite{DMNS06}; the exponential mechanism is due to McSherry and Talwar~\cite{MT07}; and Dwork and Roth give a standard reference for composition, post-processing, and basic DP tools~\cite{DworkRoth14}. Smooth sensitivity~\cite{NRS07} is conceptually related to local input structure, but our construction instead uses an explicitly low-sensitivity surrogate statistic.
+
+\paragraph{Node-private graph statistics.}
+Blocki, Blum, Datta, and Sheffet introduced restricted sensitivity and bounded-degree projection methods for private social-network analysis~\cite{BBDS13}. Kasiviswanathan, Nissim, Raskhodnikova, and Smith initiated a systematic study of graph statistics under node differential privacy~\cite{KNRS13}. Their framework motivates restricting or projecting graphs to bounded-degree families, where node sensitivity becomes controlled.
+Raskhodnikova and Smith developed Lipschitz-extension methods for node-private graph statistics and a generalized exponential mechanism that can select among candidates with different sensitivities~\cite{RS16}. Smooth-sensitivity and empirical-sensitivity approaches to graph and join statistics include Karwa, Raskhodnikova, Smith, and Yaroslavtsev~\cite{KRSY14} and Chen and Zhou~\cite{ChenZhou13}. Our mechanism layer is an application of this machinery to geometric distance graphs. The new contribution is not a new privacy primitive; it is the explicit \(b\)-matching statistic and the incidence-geometric control of its clipping bias on geometric promise classes.
+
+\paragraph{Instance-dependent mechanisms.}
+Inverse-sensitivity and approximate inverse-sensitivity mechanisms give generic instance-dependent guarantees for broad classes of functions~\cite{AsiDuchi20}. For monotone functions under user-level privacy, the shifted-inverse mechanism of Fang, Dong, and Yi gives strong instance-optimality guarantees~\cite{FDY22}. Since edge count is monotone under node insertion, these mechanisms are natural competitors. We do not claim a separation from them. The distinction is operational and analytic: the \(f_D\)-based mechanism computes an explicit degree-constrained subgraph statistic, decomposes error into a geometric bias term \(\tail_D\) and a sensitivity term \(D/\eps\), and lets incidence geometry certify worst-case-over-promise accuracy. By contrast, inverse-sensitivity mechanisms reason through the distance from the input to each output level; for exact unit-distance counts, this landscape is governed by both existing degrees and potential circle-rich insertions, as discussed in Section~\ref{sec:lower}.
+
+\paragraph{Distance and incidence geometry.}
+The exact unit-distance problem originates in Erd\H{o}s's 1946 paper~\cite{Erdos46}; Brass, Moser, and Pach survey it and many related problems in discrete geometry~\cite{BrassMoserPach05}. The best general upper bound remains \(O(n^{4/3})\), via the Szemerédi--Trotter incidence theorem and its unit-distance application by Spencer, Szemerédi, and Trotter~\cite{SzemerediTrotter83,SpencerSzemerediTrotter84}. Our rich-points lemma uses the point-curve incidence framework of Pach and Sharir~\cite{PachSharir98}. OpenAI's 2026 model disproved the longstanding \(n^{1+o(1)}\) conjecture~\cite{OpenAI2026}, and a human-verified exposition appeared immediately afterward~\cite{Remarks2026}. Sawin gave an explicit \(n^{1.014\ldots}\) lower bound~\cite{Sawin2026}. Emmerich later optimized explicit finite certificates, supporting \(u(n)>n^{1.0152}\) for arbitrarily large \(n\)~\cite{Emmerich2026}. The present paper uses the unit-distance breakthrough only as extremal context.
+
+\paragraph{Combinatorial optimization and discrepancy.}
+The statistic \(f_D\) is a maximum cardinality degree-constrained subgraph problem, equivalently a uniform-capacity \(b\)-matching problem; standard references include Schrijver's text and Gabow's algorithmic treatment of \(b\)-matching and \(f\)-factors~\cite{Schrijver03,Gabow18}. Appendix~\ref{app:route2} relates exact unit-circle workloads to discrepancy. Beck--Fiala gives the basic degree-based upper bound for set systems~\cite{BeckFiala81}, and Matoušek's book is a standard reference for geometric discrepancy~\cite{Matousek99}. In differential privacy, Hardt and Talwar~\cite{HT10}, Muthukrishnan and Nikolov~\cite{MN12}, and Nikolov, Talwar, and Zhang~\cite{NTZ13} connect query release to convex geometry and hereditary discrepancy; Dinur and Nissim's reconstruction result is an earlier foundational lower-bound reference for noisy query release~\cite{DinurNissim03}.
+
+
+
+\section{Fractional and Computational Details}
+\label{sec:extra-computation}
+
+\paragraph{Relation to fractional flow estimators.}
+A natural fractional analogue is
+\[
+f_D^{\mathrm{frac}}(G)=
+\max\left\{\sum_{e\in E}x_e:\ 0\le x_e\le 1,\ 
+\sum_{e\ni v}x_e\le D\ \text{for all }v\in V\right\}.
+\]
+This is the degree-only LP relaxation of the same \(b\)-matching problem and is closely related to the flow/projection estimators used in earlier node-private graph-statistics work~\cite{KNRS13}.
+
+\begin{proposition}[Fractional bounded-degree relaxation]
+\label{prop:fractional}
+The statistic \(f_D^{\mathrm{frac}}\) has add/remove node sensitivity at most \(D\) and satisfies
+\[
+U(G)-\tail_D(G)\le f_D(G)\le f_D^{\mathrm{frac}}(G)\le U(G).
+\]
+Moreover, adding the standard blossom/odd-set inequalities for the \(b\)-matching polytope makes the LP optimum equal to the integral value \(f_D(G)\)~\cite[Chapter 31]{Schrijver03}.
+\end{proposition}
+
+\begin{proof}
+Let \(x\) be an optimal fractional solution on \(G\). Removing all variables incident to a deleted vertex \(v\) loses at most \(D\), because \(\sum_{e\ni v}x_e\le D\), and leaves a feasible solution on \(G-v\). Conversely, any feasible solution on \(G-v\) is feasible on \(G\) after setting the new incident variables to zero. Thus the node sensitivity is at most \(D\). The upper bound \(f_D^{\mathrm{frac}}(G)\le U(G)\) follows from \(x_e\le 1\), and \(f_D(G)\le f_D^{\mathrm{frac}}(G)\) because integral feasible subgraphs are feasible fractional points. The lower bound is Proposition~\ref{prop:bias-sandwich}. The final claim is the standard integral description of the \(b\)-matching polytope by degree, box, and blossom inequalities.
+\end{proof}
+
+Without the blossom inequalities, the degree-only relaxation may differ from the integral optimum. The main mechanism uses the integral statistic \(f_D\); the new ingredient of this paper is the geometric analysis of its bias term, not a new privacy primitive.
+
+\begin{proposition}[Computation]
+\label{prop:computation}
+Given a graph \(G=(V,E)\) with \(|V|=n\) and \(|E|=m\), \(f_D(G)\) can be computed exactly in polynomial time as a maximum cardinality \(b\)-matching problem with vertex capacities \(b_v=D\)~\cite{Schrijver03,Gabow18}. Computing all values on a doubling grid of size \(K=O(\log N)\) therefore requires \(K\) exact \(b\)-matching solves. For exact unit-distance graphs, \(m=O(n^{4/3})\) by the Spencer--Szemerédi--Trotter bound, so the resulting implementation is polynomial on the incidence graphs considered here.
+\end{proposition}
+
+\begin{proof}
+Choosing \(F\subseteq E\) with at most \(D\) chosen edges incident to each vertex is exactly the unweighted \(b\)-matching problem with uniform capacities \(D\). Standard algorithms for \(b\)-matching solve this problem in polynomial time~\cite{Schrijver03,Gabow18}. The edge bound for exact unit-distance graphs is the classical \(O(n^{4/3})\) upper bound.
+\end{proof}
+
+\begin{remark}[Computational model]
+In the continuous model M1, constructing \(G_1(P)\) assumes a real-RAM model with exact distance comparisons. For rational, algebraic, or quantized inputs, exact comparisons can be implemented symbolically. Approximate floating-point comparisons correspond instead to an annulus or quantized model, not to exact M1.
+\end{remark}
+
+\begin{remark}
+All privacy statements use the exact statistic \(f_D\). A greedy or approximate proxy may be useful experimentally, but it would need its own node-sensitivity proof before it could be inserted into the mechanism.
+\end{remark}
+
+
+\section{Role of the Unit-Distance Breakthrough}
+
+The OpenAI/Sawin construction should not be used as the first practical benchmark. At realistic sizes, \(n^{0.014}\) is barely above constant; for \(n=10^6\), it is about \(1.2\). Classical scaled integer grids are likely more visible finite benchmarks.
+
+The correct roles are:
+\begin{enumerate}[leftmargin=*]
+  \item Extremal witness: exact-distance collisions can be polynomially superlinear.
+  \item Naive-vs-adaptive separation: for any near-regular construction with degree about \(n^{\alpha_{\mathrm{UD}}-1}\), adaptive mechanisms pay roughly that degree rather than \(n\).
+  \item Future discrepancy object: the lattice construction may induce a near-Cayley graph whose spectrum is analyzable.
+\end{enumerate}
+
+For a unit-distance graph satisfying the near-regularity condition
+\[
+U_1(P)\asymp n^{\alpha_{\mathrm{UD}}},\qquad
+\Delta\asymp n^{\alpha_{\mathrm{UD}}-1},
+\]
+choosing \(D\asymp \Delta\) gives noise \(O(n^{\alpha_{\mathrm{UD}}-1}/\eps)\) and relative error \(O(1/(\eps n))\). Thus the construction is not hard for a degree-adaptive mechanism. It is hard mainly for the naive global-sensitivity baseline.
+
+The idealized Cayley-graph viewpoint is regular by construction, which is why near-regularity is a plausible heuristic for the OpenAI/Sawin family. The finite certificates themselves may include boundary and multiplicity effects; this paper does not verify a near-regularity theorem for those specific certificates.
+
+\section{Computational Diagnostics}
+
+The theory suggests a small set of diagnostics rather than a systems claim. On synthetic data, the most informative families are scaled integer grids, multi-star instances, nested circle families, two-cluster annulus examples without separation, and separated annulus instances with controlled \(\Delta_{\min}\). The key measurements are the tail curve \(\tail_D(P)\), the private \(\widehat D\) selected by Theorem~\ref{thm:adaptive} versus the oracle \(D^\star\), and the exact \(b\)-matching runtime for computing \(f_D\). On coordinate-rounded location data, such as Gowalla or Brightkite check-ins, the honest baseline is the quantized-Laplace mechanism of Proposition~\ref{prop:m2}; rounded data lies in M2, where the adaptive mechanism may have little advantage. Greedy proxies may be useful for diagnostics, but they are not covered by the sensitivity proof unless separately analyzed.
+
+\appendix
+\section{Future Direction: Exact Unit-Circle Workloads}
+\label{app:route2}
+
+Let \(P\) be a finite universe of candidate points and \(C\) a set of query centers. Define
+\[
+A_{c,p}=\mathbf{1}[\|p-c\|=1].
+\]
+Rows are queries; columns are universe points. For a histogram database \(x\in \mathbb{N}^P\), the query answers are \(Ax\).
+
+The discrepancy program asks for
+\[
+\disc(A)=\min_{\chi\in\{\pm1\}^P}\|A\chi\|_\infty,\qquad
+\herdisc(A)=\max_{S\subseteq P}\disc(A|_S).
+\]
+High incidence does not imply high discrepancy. The unit-distance breakthrough gives many ones in \(A(P,P)\), but one must prove a determinant, spectral, \(\gamma_2\), or expander-type obstruction to obtain DP lower bounds.
+
+For exact unit-circle workloads, Beck--Fiala~\cite{BeckFiala81} gives
+\[
+\herdisc(A)\le O(\Delta),
+\]
+where \(\Delta\) is the maximum number of unit circles containing a point, equivalently the maximum degree in the corresponding unit-distance graph when \(C=P\).
+
+For the Sawin/OpenAI near-Cayley construction, the idealized adjacency operator has the form
+\[
+(Af)(x)=\sum_{s\in S} f(x+s),
+\]
+with eigenvalues
+\[
+\lambda_\chi=\sum_{s\in S}\chi(s).
+\]
+The concrete future problem is to estimate these character sums and determine whether they imply a hereditary-discrepancy lower bound or instead a high-incidence/low-discrepancy separation.
+
+\section*{Acknowledgments and AI Use Disclosure}
+
+The authors used OpenAI Codex to assist with language polishing, reference organization and grammatical editing of this manuscript. The authors reviewed the resulting text and are responsible for all mathematical claims, citations, and presentation. The authors assume responsibility for all content.
+
+\bibliographystyle{plainurl}
+\bibliography{refs}
+
+\end{document}
