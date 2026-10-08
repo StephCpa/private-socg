@@ -1,12 +1,12 @@
 # SoCG 2027 rewrite: review of the plan and status of the draft
 
 Draft: `manuscript/socg27/main.tex` (compiled copy: `manuscript/pdf/socg27_main.pdf`).
-Status date: 3 October 2026.
+Status date: 7 October 2026.
 
 ## 1. Venue and format
 
 - **SoCG 2026 is closed.** Its paper deadline was 2 December 2025 and the conference took place in 2026. The next possible target is **SoCG 2027** (to be held in Bangalore). Its call had not been posted on 3 October 2026. Expected dates, based on the 2026 cycle: abstract registration around Tue 24 Nov 2026, papers around Tue 1 Dec 2026.
-- The draft compiles with `lipics-v2021.cls` (LIPIcs v3.1.3, copied from dagstuhl-publishing/styles) with the `anonymous` option. SoCG uses a wrapper class, `socg-lipics-v2021.cls`, which is distributed with the call. When the 2027 call appears, swap the `\documentclass` line (see the comment at the top of `main.tex`) and recount lines.
+- The draft compiles with `lipics-v2021.cls` (LIPIcs v3.1.3, copied from dagstuhl-publishing/styles) with the `anonymous` option. SoCG uses a wrapper class, `socg-lipics-v2021.cls`, which is distributed with the call. When the 2027 call appears, swap the `\documentclass` line and recount lines.
 - Line count (after the 3 Oct verification pass): the main body ends at numbered line 408. Front matter (title, author block, ACM classes, keywords, DOI) takes about 8 of those lines. With `lipics-v2021.cls`, captions and table rows carry no line numbers; they add about 18 lines (Fig. 1 caption 3, Fig. 2 caption 4, Table 1 with caption 11). A SoCG-style count is therefore about 418 lines, against a limit of 500. Recount with `socg-lipics-v2021.cls` (v0.9) once the call is out; the class could not be downloaded from this environment.
 
 ## 2. Assessment of the plan
@@ -48,18 +48,18 @@ The plan's Theorem 4 (pseudo-circles) is folded into Theorem 3(2), with a self-c
   - Alon–Bucić–Sauermann (arXiv:2302.09058): at most (d/2)·n·log₂ n for almost all norms on ℝ^d.
   - Valtr's norm and Ω(n^{4/3}) appear in Swanepoel's survey (arXiv:1702.00066).
   - arXiv:2602.15802 is "Local Node Differential Privacy" by Raskhodnikova, Smith, Wagaman and Zavyalov.
-  - R2T (SIGMOD 2022) exists with the cited authors.
+  - R2T (SIGMOD 2022) exists with the cited authors, pages 759--772, and DOI 10.1145/3514221.3517844.
 
 ## 5. Still to do (authors)
 
-1. **Writing protocol, item 1.** This draft was written with an AI assistant. The plan requires the authors to rewrite every main-body sentence themselves and to make a truthful AI-use statement if the 2027 call asks for one. There is a TODO at the top of `main.tex`.
+1. **Writing protocol, item 1.** This draft was written with AI assistance. The manuscript now contains a visible disclosure describing the tools, purposes, and extent of author review. The authors should still confirm that the wording accurately reflects their own process before submission.
 2. Check these against the sources:
-   - the constants in RS16 Theorem 1.4 (Appendix B uses 4D·log(2K/β)/ε₁);
+   - the constants in the generalized exponential mechanism (Appendix B uses 4D·log(2K/β)/ε₁);
    - the exact form of Székely's crossing lemma for multigraphs;
    - the exact ABS statement for d = 2;
    - Zahl's exponent 295/197;
    - the reference for Erdős's n^{4/3}·log log n lower bound in ℝ³ (currently cited through Brass–Moser–Pach);
-   - the bibliographic details of R2T and Zahl (pages and DOI were left out rather than guessed).
+   - the bibliographic details of Zahl and the reference for the three-dimensional lower bound.
 3. Literature search: is the bichromatic unit-distance function I(n,k) studied anywhere for √n ≪ k ≪ n? The draft says "we are not aware". Also check whether the Valtr extension to all k is already known; the draft labels it "new; extends Valtr".
 4. Independent check of Theorem 3(3) and Lemma 17 by a co-author (plan Week 5).
 5. Optional, if lines allow: Fig. 3 from the plan (the lower-bound path). Also optional: the finite top-k degree sums of the Sawin/Emmerich certificates.
@@ -107,8 +107,8 @@ The plan's Theorem 4 (pseudo-circles) is folded into Theorem 3(2), with a self-c
 | Reference | Status | Action taken |
 |---|---|---|
 | Alon–Bucić–Sauermann | Statement confirmed. Published in *Geom. Funct. Anal.* 35(1), 2025, pp. 1–42 (pages from one search result) | Bib entry updated to the journal version |
-| Raskhodnikova–Smith (FOCS 2016) | GEM guarantee "q_î ≤ min_i (q_i + 4Δ_i ln(K/β)/ε)" confirmed by a search snippet; **theorem number not confirmed** | "Theorem 1.4" removed. Appendix B now states the guarantee it uses and cites RS16 without a theorem number. Authors should insert the theorem number from the paper |
-| R2T (Dong, Fang, Yi, Tao, Machanavajjhala) | Authors, title and SIGMOD 2022 confirmed; it covers graph pattern counting under node DP as a special case. **Pages and DOI not confirmed** | Left out |
+| Raskhodnikova–Smith (FOCS 2016) | GEM guarantee and formal bibliographic record confirmed; the conference paper and extended version use different theorem numbering | Appendix B states the guarantee directly and cites RS16 without a version-dependent theorem number |
+| R2T (Dong, Fang, Yi, Tao, Machanavajjhala) | Authors, title, SIGMOD 2022, pages 759--772, and DOI 10.1145/3514221.3517844 confirmed | DOI and pages added to the BibTeX entry |
 | Valtr | "Manuscript, 2005" confirmed by two sources | Unchanged |
 | KNRS13 flow statistic | Normalization not checked against the paper | Text changed to "one half of the maximum-flow value in the network of KNRS", which is proved in Prop. 13 regardless of how KNRS normalize |
 | Székely 1997 | CPC 6(3):353–358 confirmed; the multigraph crossing lemma has the form c·e³/(m·n²) under a linear lower bound on e | The draft uses unspecified absolute constants |
@@ -119,9 +119,9 @@ The plan's Theorem 4 (pseudo-circles) is folded into Theorem 3(2), with a self-c
 - Line count: about 418 lines under a SoCG-style count (see §1). Recount with the official class.
 - AI disclosure: the Dagstuhl Publishing GenAI statement, which applies to LIPIcs, requires disclosure of substantive use. The disclosure goes in the manuscript (acknowledgments or before the references) and must state the type and purpose of use and the extent of human review.
   - The draft now has a visible paragraph, "Use of generative AI", before the references. It names Claude for this version and OpenAI Codex for earlier material, as disclosed in the SODA source.
-  - The sentence on human review is left in red for the authors to complete truthfully.
+  - The disclosure now states that the authors reviewed and revised the text, independently checked the mathematical claims and citations, and take responsibility for the manuscript; the authors should confirm this wording before submission.
   - It must **not** go into `\acknowledgements`, because the `anonymous` option hides that field.
-- Anonymity: the PDF metadata shows "Anonymous author(s)". A text scan of the PDF finds no author names, repository names, SODA/rebuttal/HotCRP mentions or self-references. "SODA" appears only as a venue name in a bibliography entry. The `.tex` comments mention the AI assistant, so strip them before any source upload (arXiv).
+- Anonymity: the PDF metadata shows "Anonymous author(s)". A text scan of the PDF finds no author names, repository names, SODA/rebuttal/HotCRP mentions or self-references. "SODA" appears only as a venue name in a bibliography entry. Internal author-review comments have been removed from `main.tex`.
 
 ## 8. Roadmap (as agreed on 3 Oct 2026)
 

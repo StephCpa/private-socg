@@ -4,7 +4,7 @@ This repository collects the LaTeX sources, bibliography, compiled PDFs, and sel
 
 ## Contents
 
-- `manuscript/socg27/main.tex`: SoCG 2027 rewrite in LIPIcs format (anonymous). It is organised around the top-degree mass Λ_k(n) of unit-distance graphs: the reduction from node-private counting, the link to unit-circle incidences, the classification over norms (including Valtr's norm), and the Euclidean window. `manuscript/pdf/socg27_main.pdf` is the compiled copy.
+- `manuscript/socg27/main.tex`: SoCG 2027 rewrite in LIPIcs format (anonymous). It is organised around the top-degree mass Λ_k(n) of unit-distance graphs: the reduction from node-private counting, the link to unit-circle incidences, comparisons across norm classes (including Valtr's norm), and the Euclidean window. `manuscript/pdf/socg27_main.pdf` is the compiled copy.
 - `notes/SoCG27_plan_review.md`: review of the SoCG rewrite plan, a traceability table for the required revisions, verification log, and remaining author tasks.
 - `notes/socg27_sanity_checks.py`: numerical checks for the lemmas and the Valtr construction in the SoCG draft.
 - `manuscript/local_minimax_working.tex`: current working manuscript. It develops the local-minimax formulation, the geometric degree-tail bounds, and the node-private counting application.

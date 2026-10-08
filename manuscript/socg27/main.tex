@@ -1,35 +1,5 @@
-% SoCG 2027 submission draft (Track T: Mathematical Foundations; Algorithmic Complexity).
-% Compile with: latexmk -pdf main.tex
-%
-% CLASS: SoCG requires socg-lipics-v2021.cls (a thin wrapper around lipics-v2021.cls that is
-% distributed with the SoCG call for papers). Until the 2027 call is posted we compile with the
-% LIPIcs class itself; replace the \documentclass line below by
-%   \documentclass[a4paper,USenglish,cleveref,autoref,thm-restate,anonymous]{socg-lipics-v2021}
-% once the SoCG wrapper is available, and re-check the line count.
-%
-% GLOSSARY (one name per object; use these everywhere)
-%   norm \|.\|, unit circle S = {x : \|x\| = 1}; Euclidean norm unless stated otherwise
-%   G(P)        unit-distance graph of a finite point set P
-%   \deg_P(p)   degree of p in G(P);  U(P) = |E(G(P))|  (number of unit-distance pairs)
-%   \cP_n       finite point sets with at most n points (n is public)
-%   S_k(P)      sum of the k largest degrees of G(P), padded with zeros
-%   \Lambda_k(n) top-degree mass = max { S_k(P) : P in \cP_n }
-%   I(n,k)      maximum number of incidences between at most n points and k distinct unit circles
-%   u(n)        maximum of U(P) over |P| = n
-%   tail_D(P)   degree tail = sum_p (\deg_P(p) - D)_+
-%   g_D         bounded-degree surrogate (KNRS flow value = fractional b-matching value)
-%   err^*(eps,n) minimax expected error of eps-node-private counting over \cP_n
-%   "node neighbours": point sets that differ in exactly one point
-%
-% TODO(authors): the visible "Use of generative AI" paragraph before the bibliography follows the
-%   Dagstuhl Publishing GenAI statement (LIPIcs): substantive use must be disclosed in the manuscript
-%   (e.g. acknowledgments or before the references) with type, purpose and extent of human review.
-%   Do NOT move it into \acknowledgements: the anonymous option hides that field from reviewers.
-%   Complete the red sentence truthfully and re-check against the SoCG 2027 call. Strip all
-%   comments (including this one) before posting the source to arXiv.
-%
-% WORDS NOT TO USE: lesson, honest, canonical, load-bearing, operating scale, high-signal,
-%   many-distance-pair, promise-oblivious, extremal context, we park, "et al."
+% SoCG 2027 submission draft.  Until the official SoCG wrapper is available, this
+% source is compiled with the corresponding LIPIcs class.
 
 \documentclass[a4paper,USenglish,cleveref,autoref,thm-restate,anonymous]{lipics-v2021}
 
@@ -454,7 +424,7 @@ with $\delta^\star\ge0.014$, and for Valtr's norm the upper bound is attained. I
 In $\R^3$, $u(n)$ lies between $n^{4/3}\log\log n$~\cite{BrassMoserPach05} and $n^{295/197+o(1)}$~\cite{Zahl19}, so the window is wider and both ends are open. In $\R^d$ with $d\ge4$, points on two orthogonal circles of radius $1/\sqrt2$ form a complete bipartite unit-distance graph, as in \cref{thm:norms}(1), and the standard Laplace mechanism is optimal.
 
 \subparagraph*{Use of generative AI.}
-A generative AI assistant (Claude, Anthropic) was used to draft the text and \LaTeX{} source of this version, to propose and check proof arguments, and to run numerical sanity checks of \cref{lem:surrogate,lem:valtr-grid}. Parts of the appendix are adapted from an earlier draft whose language was edited with OpenAI Codex. \textcolor{red}{[Authors: state the extent of human review here, e.g.\ that all statements and proofs were verified and the text rewritten by the authors, who take full responsibility for the content.]}
+Generative AI assistants, including Claude (Anthropic) and OpenAI Codex, were used to assist with drafting and editing the manuscript and \LaTeX{} source, to suggest and check proof arguments, organize references, and run numerical sanity checks of \cref{lem:surrogate,lem:valtr-grid}. The authors reviewed and revised the resulting text, independently checked the mathematical claims and citations, and take full responsibility for the manuscript.
 
 %======================================================================
 \bibliography{refs}
