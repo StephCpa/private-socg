@@ -1,7 +1,18 @@
 # SoCG 2027 rewrite: review of the plan and status of the draft
 
 Draft: `manuscript/socg27/main.tex` (compiled copy: `manuscript/pdf/socg27_main.pdf`).
-Status date: 7 October 2026.
+Status date: 25 November 2026.
+
+## Current submission-format check (supersedes earlier format notes)
+
+- Official CFP: https://cgweek27.computational-geometry.org/contribute/
+- Downloaded the unmodified official v0.9 wrapper from https://computational-geometry.org/documents/socg-lipics-v2021.cls and selected it with `anonymous`.
+- Rebuilt PDF: 17 pages; first-page counter **Lines: 417**. Captions and table rows are numbered; the first-page DOI is suppressed. All fonts are embedded. No undefined citations/references or overfull boxes. The wrapper emits a `LT@start has changed` compatibility warning; the table numbering was checked in the rendered output.
+- `AI Statement` is a separate unnumbered section immediately after the bibliography and before the appendix. The previously inserted assertion that the human authors independently verified every claim was removed pending author confirmation. AI-assisted checking is not a substitute for human verification. The submission form also needs the AI-methodology disclosure required by CFP section 4.2.
+- The introduction now leads with unbalanced incidences and highlights the all-k Valtr construction; privacy follows as an application. Known-tool provenance is retained.
+- The disproof is now cited through the human-verified arXiv paper `Remarks2026`, not the OpenAI blog. Valtr's author page still lists the manuscript as submitted; no formal publication was established. Its original PDF URL has been added.
+- Official registration deadline: 25 November 2026, 23:59 AoE; paper deadline: 2 December 2026, 23:59 AoE.
+- This formatting pass does not resolve the independent-proof-review and novelty-search tasks recorded below. Historical claims of complete verification in these notes are not a certification of human review.
 
 ## 1. Venue and format
 

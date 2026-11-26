@@ -1,7 +1,4 @@
-% SoCG 2027 submission draft.  Until the official SoCG wrapper is available, this
-% source is compiled with the corresponding LIPIcs class.
-
-\documentclass[a4paper,USenglish,cleveref,autoref,thm-restate,anonymous]{lipics-v2021}
+\documentclass[anonymous,a4paper,USenglish,cleveref,autoref,thm-restate]{socg-lipics-v2021}
 
 \usepackage{amsmath,amssymb,mathtools}
 \usepackage{booktabs}
@@ -59,7 +56,9 @@ We then compare norms on the plane. $\Lam_k(n)=\Theta(kn)$ if the unit circle co
 \section{Introduction}
 \label{sec:intro}
 
-Let $P$ be a finite set of points in the plane and let $G(P)$ be its \emph{unit-distance graph}: two points are adjacent if their distance is exactly~$1$. Erd\H{o}s~\cite{Erdos46} asked for the maximum number $u(n)$ of edges of $G(P)$ over $n$-point sets. The upper bound $u(n)=O(n^{4/3})$ of Spencer, Szemer\'edi and Trotter~\cite{SpencerSzemerediTrotter84} has not been improved. Erd\H{o}s conjectured $u(n)=n^{1+o(1)}$; in 2026 this conjecture was disproved~\cite{OpenAI2026,Remarks2026}, and Sawin~\cite{Sawin2026} gave sets with more than $n^{1.014}$ unit distances for arbitrarily large~$n$.
+How many incidences can $n$ points have with $k$ unit circles when $k$ is much smaller than $n$? This unbalanced incidence problem asks whether a small collection of centres can account for a large fraction of the unit distances. We study its relation to the sum of the largest degrees in a unit-distance graph, and how the answer changes with the norm. Our aspect-ratio-dependent construction in Valtr's norm attains the strictly convex incidence bound for every $1\le k\le n$ (\cref{thm:norms}(3)). Thus any improvement in the Euclidean case must use more than strict convexity. \Cref{thm:euclid} connects the remaining Euclidean range to the unit-distance extremal function. Node-private counting then gives an application in which precisely this geometric quantity determines the minimax error.
+
+Let $P$ be a finite set of points in the plane and let $G(P)$ be its \emph{unit-distance graph}: two points are adjacent if their distance is exactly~$1$. Erd\H{o}s~\cite{Erdos46} asked for the maximum number $u(n)$ of edges of $G(P)$ over $n$-point sets. The upper bound $u(n)=O(n^{4/3})$ of Spencer, Szemer\'edi and Trotter~\cite{SpencerSzemerediTrotter84} has not been improved. Erd\H{o}s conjectured $u(n)=n^{1+o(1)}$; in 2026 this conjecture was disproved~\cite{Remarks2026}, and Sawin~\cite{Sawin2026} gave sets with more than $n^{1.014}$ unit distances for arbitrarily large~$n$.
 
 This paper studies a refinement of $u(n)$ that measures how unevenly unit distances can be distributed among the points. For a finite set $P$ and an integer $k\ge1$, let $S_k(P)$ be the sum of the $k$ largest degrees of $G(P)$ (padded with zeros if $k>|P|$), and define the \emph{top-degree mass}
 \[
@@ -68,7 +67,7 @@ This paper studies a refinement of $u(n)$ that measures how unevenly unit distan
 In this definition the $k$ points whose degrees are summed belong to $P$; the maximum is over all sets of at most $n$ distinct points. Thus $\Lam_1(n)=n-1$ for $n\ge2$ (a point together with $n-1$ points on its unit circle), and $\Lam_k(n)=2u(n)$ for $k\ge n$. In between, $\Lam_k(n)$ asks how many unit distances $k$ points can see.
 
 \subparagraph*{The privacy problem.}
-Our motivation comes from differential privacy. Suppose each point of $P$ is the location of one person, and we wish to publish the number $U(P)$ of unit-distance pairs. \emph{Node differential privacy} requires that adding or removing one person, together with all pairs that contain this person, changes the distribution of the published value by at most a factor $e^{\eps}$ (see \cref{sec:prelim} for a self-contained introduction). One point can form a unit-distance pair with all others, so the standard Laplace mechanism must add noise of order $n/\eps$. We ask for the \emph{minimax error}
+An application of this geometric question arises in differential privacy. Suppose each point of $P$ is the location of one person, and we wish to publish the number $U(P)$ of unit-distance pairs. \emph{Node differential privacy} requires that adding or removing one person, together with all pairs that contain this person, changes the distribution of the published value by at most a factor $e^{\eps}$ (see \cref{sec:prelim} for a self-contained introduction). One point can form a unit-distance pair with all others, so the standard Laplace mechanism must add noise of order $n/\eps$. We ask for the \emph{minimax error}
 \[
   \errs(\eps,n)\;=\;\inf_{M}\ \sup_{|P|\le n}\ \Ex\,\bigl|M(P)-U(P)\bigr|,
 \]
@@ -182,7 +181,7 @@ Result & Statement & Status \\
 \end{table}
 
 \subparagraph*{Related work.}
-\emph{Unit distances and incidences.} Besides the bounds above, the unit-distance problem is surveyed by Brass, Moser and Pach~\cite{BrassMoserPach05}. The $O(n^{4/3})$ bound follows from incidence bounds for points and curves~\cite{SzemerediTrotter83,CEGSW90,PachSharir98}, and Sz\'ekely's crossing-number argument~\cite{Szekely97} gives it for any family of curves in which two curves meet in at most two points and two points lie on at most two curves. For normed planes, Swanepoel's survey~\cite{Swanepoel18} describes the known results, including Valtr's construction. After the disproof of Erd\H{o}s's conjecture~\cite{OpenAI2026,Remarks2026}, Sawin~\cite{Sawin2026} gave the exponent $1.014$ and Emmerich~\cite{Emmerich2026} optimised explicit finite certificates. We use these results only through \cref{thm:incidences}; we do not use their structure.
+\emph{Unit distances and incidences.} Besides the bounds above, the unit-distance problem is surveyed by Brass, Moser and Pach~\cite{BrassMoserPach05}. The $O(n^{4/3})$ bound follows from incidence bounds for points and curves~\cite{SzemerediTrotter83,CEGSW90,PachSharir98}, and Sz\'ekely's crossing-number argument~\cite{Szekely97} gives it for any family of curves in which two curves meet in at most two points and two points lie on at most two curves. For normed planes, Swanepoel's survey~\cite{Swanepoel18} describes the known results, including Valtr's construction. After the disproof of Erd\H{o}s's conjecture~\cite{Remarks2026}, Sawin~\cite{Sawin2026} gave the exponent $1.014$ and Emmerich~\cite{Emmerich2026} optimised explicit finite certificates. We use these results only through \cref{thm:incidences}; we do not use their structure.
 
 \emph{Node privacy.} Node differential privacy for graphs was studied by Blocki, Blum, Datta and Sheffet~\cite{BBDS13} and by Kasiviswanathan, Nissim, Raskhodnikova and Smith~\cite{KNRS13}, who introduced the bounded-degree flow statistic we use. For a family closed under deletion, the restricted sensitivity of Blocki, Blum, Datta and Sheffet is $\Lam_1(n)$ in our notation, which leads to error about $\Lam_1(n)/\eps$. \Cref{thm:reduction} replaces this by $\Lam_{\lceil 1/\eps\rceil}(n)$, which is never larger; for strictly convex norms it is smaller by a factor of order at least $\eps^{-2/3}$. Raskhodnikova and Smith~\cite{RS16} developed Lipschitz extensions and the generalized exponential mechanism used in \cref{sec:privacy}. Instance-dependent guarantees in terms of down sensitivity appear in work of Asi and Duchi~\cite{AsiDuchi20}, Fang, Dong and Yi~\cite{FDY22}, and Dong, Fang, Yi, Tao and Machanavajjhala~\cite{R2T22}; see also Cummings and Durfee~\cite{CummingsDurfee20}. Recent node-private results include counting connected components~\cite{KalemajRST23}, continual observation~\cite{JainSmithWagaman24} and graphon estimation~\cite{ChenEtAl24Graphon}. Raskhodnikova, Smith, Wagaman and Zavyalov~\cite{RSWZ26} study node privacy in the \emph{local} model, where each person randomizes their own edge list; we work in the central model, where a trusted curator holds the data. We are not aware of earlier work that links node privacy to incidence geometry.
 
@@ -423,11 +422,11 @@ with $\delta^\star\ge0.014$, and for Valtr's norm the upper bound is attained. I
 \subparagraph*{Higher dimensions.}
 In $\R^3$, $u(n)$ lies between $n^{4/3}\log\log n$~\cite{BrassMoserPach05} and $n^{295/197+o(1)}$~\cite{Zahl19}, so the window is wider and both ends are open. In $\R^d$ with $d\ge4$, points on two orthogonal circles of radius $1/\sqrt2$ form a complete bipartite unit-distance graph, as in \cref{thm:norms}(1), and the standard Laplace mechanism is optimal.
 
-\subparagraph*{Use of generative AI.}
-Generative AI assistants, including Claude (Anthropic) and OpenAI Codex, were used to assist with drafting and editing the manuscript and \LaTeX{} source, to suggest and check proof arguments, organize references, and run numerical sanity checks of \cref{lem:surrogate,lem:valtr-grid}. The authors reviewed and revised the resulting text, independently checked the mathematical claims and citations, and take full responsibility for the manuscript.
-
 %======================================================================
 \bibliography{refs}
+
+\section*{AI Statement}
+Generative AI assistants, including Claude (Anthropic) and OpenAI Codex, were used to assist with drafting and editing the manuscript and \LaTeX{} source, to suggest and check proof arguments, organize references, and run numerical sanity checks of \cref{lem:surrogate,lem:valtr-grid}. The authors are responsible for all mathematical claims, citations, and presentation.
 
 %======================================================================
 \appendix
