@@ -5,6 +5,8 @@ Status date: 25 November 2026.
 
 ## Current submission-format check (supersedes earlier format notes)
 
+Latest content polish: the abstract now leads with geometry; the all-k statement explicitly includes the linear lower bound; the contribution discussion explains the variable-aspect-ratio grid construction; Section 8 states a conjectural uniform Euclidean bound; Figure 1 labels delta=0.06 as illustrative only. The rebuilt first-page counter is **Lines: 423** (superseding the 417-line build below). The plain-text abstract in `SoCG27_hotcrp_abstract.txt` is ready for the submission form; the live HotCRP record has not been updated.
+
 - Official CFP: https://cgweek27.computational-geometry.org/contribute/
 - Downloaded the unmodified official v0.9 wrapper from https://computational-geometry.org/documents/socg-lipics-v2021.cls and selected it with `anonymous`.
 - Rebuilt PDF: 17 pages; first-page counter **Lines: 417**. Captions and table rows are numbered; the first-page DOI is suppressed. All fonts are embedded. No undefined citations/references or overfull boxes. The wrapper emits a `LT@start has changed` compatibility warning; the table numbering was checked in the rendered output.

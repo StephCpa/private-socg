@@ -48,15 +48,15 @@
 \maketitle
 
 \begin{abstract}
-Erd\H{o}s asked how many pairs among $n$ points in the plane can be at distance exactly~$1$. We study an unbalanced version of this question and show that it determines the cost of a basic task in data privacy. Let $\Lam_k(n)$ be the largest possible sum of the $k$ largest degrees in the unit-distance graph of at most $n$ points. We prove that the smallest expected error with which the number of unit-distance pairs can be released under $\eps$-node differential privacy is $\Theta(\Lam_{\lceil 1/\eps\rceil}(n))$, with absolute constants, for every $\eps\in(0,1]$. We also show that for $k\le n/2$, $\Lam_k(n)$ equals, up to a factor of~$2$, the maximum number of incidences between $n$ points and $k$ unit circles with arbitrary centres.
-We then compare norms on the plane. $\Lam_k(n)=\Theta(kn)$ if the unit circle contains a segment; $\Lam_k(n)=O(n^{2/3}k^{2/3}+n)$ if the norm is strictly convex, and a norm found by Valtr attains this bound for every~$k$; by a theorem of Alon, Buci\'c and Sauermann, $\Lam_k(n)=\Theta(n)$ up to a logarithmic factor for all norms outside a meagre set. For the Euclidean norm the optimal error is $\Theta(n)$ when $\eps\ge n^{-1/2}$, a factor $1/\eps$ below the standard Laplace mechanism. It is polynomially larger than for these generic norms if and only if Erd\H{o}s's unit-distance conjecture fails, which was shown in 2026. Between these ranges the Euclidean question is an open problem on unbalanced unit-circle incidences.
+We study unbalanced unit-circle incidences through the top-degree mass $\Lam_k(n)$, the largest possible sum of the $k$ largest degrees in a unit-distance graph of at most $n$ planar points. For $k\le n/2$, this quantity agrees within a factor of~$2$ with the maximum number of incidences between $n$ points and $k$ unit circles with arbitrary centres. We compare its growth across norms for $1\le k\le n$. It is $\Theta(kn)$ when the unit circle contains a segment and $O(n^{2/3}k^{2/3}+n)$ for strictly convex norms. An aspect-ratio-dependent grid construction in Valtr's norm, together with the linear lower bound, matches the latter bound for every~$k$. Thus strict convexity alone cannot yield an improvement at any scale. For norms outside a meagre set, a theorem of Alon, Buci\'c and Sauermann instead bounds the top-degree mass between linear and $O(n\log n)$.
+As an application, we characterize the minimax expected error of unit-distance counting under $\eps$-node differential privacy as $\Theta(\Lam_{\lceil1/\eps\rceil}(n))$ for every $\eps\in(0,1]$. In the Euclidean plane this gives error $\Theta(n)$ for $\eps\ge n^{-1/2}$, a factor $1/\eps$ below the standard Laplace mechanism. Polynomially superlinear error at some privacy levels is equivalent to a polynomially superlinear unit-distance extremal function, as established in 2026. The remaining Euclidean range leads to an open problem on unbalanced incidences.
 \end{abstract}
 
 %======================================================================
 \section{Introduction}
 \label{sec:intro}
 
-How many incidences can $n$ points have with $k$ unit circles when $k$ is much smaller than $n$? This unbalanced incidence problem asks whether a small collection of centres can account for a large fraction of the unit distances. We study its relation to the sum of the largest degrees in a unit-distance graph, and how the answer changes with the norm. Our aspect-ratio-dependent construction in Valtr's norm attains the strictly convex incidence bound for every $1\le k\le n$ (\cref{thm:norms}(3)). Thus any improvement in the Euclidean case must use more than strict convexity. \Cref{thm:euclid} connects the remaining Euclidean range to the unit-distance extremal function. Node-private counting then gives an application in which precisely this geometric quantity determines the minimax error.
+How many incidences can $n$ points have with $k$ unit circles when $k$ is much smaller than $n$? This unbalanced incidence problem asks whether a small collection of centres can account for a large fraction of the unit distances. We study its relation to the sum of the largest degrees in a unit-distance graph, and how the answer changes with the norm. Our construction in Valtr's norm, together with the linear lower bound, matches the strictly convex upper bound for every $k$ (\cref{thm:norms}(3)). Thus any improvement in the Euclidean case must use more than strict convexity. \Cref{thm:euclid} connects the remaining Euclidean range to the unit-distance extremal function. Node-private counting then gives an application in which precisely this geometric quantity determines the minimax error.
 
 Let $P$ be a finite set of points in the plane and let $G(P)$ be its \emph{unit-distance graph}: two points are adjacent if their distance is exactly~$1$. Erd\H{o}s~\cite{Erdos46} asked for the maximum number $u(n)$ of edges of $G(P)$ over $n$-point sets. The upper bound $u(n)=O(n^{4/3})$ of Spencer, Szemer\'edi and Trotter~\cite{SpencerSzemerediTrotter84} has not been improved. Erd\H{o}s conjectured $u(n)=n^{1+o(1)}$; in 2026 this conjecture was disproved~\cite{Remarks2026}, and Sawin~\cite{Sawin2026} gave sets with more than $n^{1.014}$ unit distances for arbitrarily large~$n$.
 
@@ -154,7 +154,7 @@ By the 2026 results, both hold: for every $\eta\in[0,0.014)$ there are infinitel
   \draw[very thick] (0,0) -- (1,0);
   \node[above] at (0.25,0.0) {\small generic norms};
 \end{tikzpicture}
-\caption{Exponent of the optimal error against $\log_n(1/\eps)$. Shaded: the range allowed for the Euclidean norm by \cref{thm:euclid}; its lower edge is drawn with $\delta=0.06$, while the best known value is $\delta\ge0.014$.}
+\caption{Exponent of the optimal error against $\log_n(1/\eps)$. Shaded: schematic range allowed for the Euclidean norm by \cref{thm:euclid}. The value $\delta=0.06$ is used only for illustration; the theorem uses the established exponent $0.014$.}
 \label{fig:rates}
 \end{figure}
 
@@ -168,7 +168,7 @@ By the 2026 results, both hold: for every $\eta\in[0,0.014)$ there are infinitel
 Result & Statement & Status \\
 \midrule
 \Cref{thm:reduction} & $\errs(\eps,n)=\Theta(\Lam_{\lceil1/\eps\rceil}(n))$ & known tools; new form \\
-\Cref{thm:incidences} & $\Lam_k(n)$ and $I(n,k)$ agree up to a factor $2$ ($k\le n/2$) & new (short) \\
+\Cref{thm:incidences} & $\Lam_k(n)$ and $I(n,k)$ agree up to a factor $2$ ($k\le n/2$) & incidence equivalence \\
 \Cref{thm:norms}(1),(4) & segment norms; generic norms & new; uses \cite{ABS23} \\
 \Cref{thm:norms}(2) & strictly convex norms & known incidence bound \\
 \Cref{thm:norms}(3) & Valtr's norm is extremal for every $k$ & new; extends \cite{Valtr05} \\
@@ -179,6 +179,8 @@ Result & Statement & Status \\
 \caption{Results and their provenance.}
 \label{tab:results}
 \end{table}
+
+The construction behind \cref{thm:norms}(3) varies the aspect ratio of a point--line incidence grid and transfers it to the upper parabolic arcs of Valtr's unit circles. It realizes the $n^{2/3}k^{2/3}$ term in the unbalanced range; the star bound supplies the linear term for small $k$. This extends the balanced construction without claiming a new privacy primitive.
 
 \subparagraph*{Related work.}
 \emph{Unit distances and incidences.} Besides the bounds above, the unit-distance problem is surveyed by Brass, Moser and Pach~\cite{BrassMoserPach05}. The $O(n^{4/3})$ bound follows from incidence bounds for points and curves~\cite{SzemerediTrotter83,CEGSW90,PachSharir98}, and Sz\'ekely's crossing-number argument~\cite{Szekely97} gives it for any family of curves in which two curves meet in at most two points and two points lie on at most two curves. For normed planes, Swanepoel's survey~\cite{Swanepoel18} describes the known results, including Valtr's construction. After the disproof of Erd\H{o}s's conjecture~\cite{Remarks2026}, Sawin~\cite{Sawin2026} gave the exponent $1.014$ and Emmerich~\cite{Emmerich2026} optimised explicit finite certificates. We use these results only through \cref{thm:incidences}; we do not use their structure.
@@ -414,7 +416,11 @@ For $\alpha\in[\frac12,1]$ let $\gamma(\alpha)=\limsup_{n\to\infty}\log\Lam_{\lc
 \[
   \max\{1,\ \alpha+\delta^\star\}\;\le\;\gamma(\alpha)\;\le\;\tfrac{2+2\alpha}{3},
 \]
-with $\delta^\star\ge0.014$, and for Valtr's norm the upper bound is attained. Is the lower bound the truth? In words: can a few unit circles be much richer than average while the unit-distance graph as a whole stays sparse? By \cref{thm:incidences} this is a question about incidences between $n$ points and $k$ unit circles. We are not aware of results on this unbalanced version beyond the bounds above.
+with $\delta^\star\ge0.014$, and for Valtr's norm the upper bound is attained. We conjecture that in the Euclidean norm, uniformly for $\sqrt n\le k\le n$,
+\[
+  \Lam_k(n)\le n^{o(1)}\left(n+\frac{k\,u(n)}{n}\right).
+\]
+The matching lower bound up to an absolute constant follows from \cref{thm:incidences}; the conjecture would give $\gamma(\alpha)=\max\{1,\alpha+\delta^\star\}$. It asks whether a few unit circles can be polynomially richer than the linear and averaging bounds predict. This is a proposed strengthening, not a consequence of the incidence upper bound or the known constructions.
 
 \subparagraph*{Instance-wise bounds.}
 \Cref{thm:reduction} concerns the worst case over $\cP_n$. A local version would compare an algorithm, at each input $P$, with the best algorithm on a small neighbourhood of $P$. Deleting points is controlled by $S_t(P)$, as in \cref{thm:adaptive}; adding points brings in the external quantity $\max_{c\notin P}|P\cap(c+\mathbb S)|$ and its analogues for several inserted points.
